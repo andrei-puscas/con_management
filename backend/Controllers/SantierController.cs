@@ -2,6 +2,7 @@ using Backend.DTOs.Santier;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers;
 
@@ -18,7 +19,11 @@ public class SantierController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<SantierDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] int? proiectId, CancellationToken cancellationToken)
     {
-        var list = await _service.GetAllAsync(proiectId, cancellationToken);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = userIdClaim != null && int.TryParse(userIdClaim, out var id) ? id : (int?)null;
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        var list = await _service.GetAllAsync(userId, userRole, proiectId, cancellationToken);
         return Ok(list);
     }
 

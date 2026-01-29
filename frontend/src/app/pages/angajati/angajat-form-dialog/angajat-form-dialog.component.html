@@ -20,6 +20,23 @@
       }
     </select>
   </div>
+
+  @if (!isEdit) {
+    <div class="rounded-md border border-neutral-200 bg-neutral-50 p-3 space-y-3">
+      <div class="flex items-start gap-2">
+        <input type="checkbox" id="angajat-create-user" formControlName="createUser" class="mt-1 h-4 w-4 rounded border-neutral-300 text-primary focus:ring-primary" />
+        <label for="angajat-create-user" class="text-sm font-medium text-neutral-700">Creează automat cont utilizator pentru acest angajat</label>
+      </div>
+      @if (form.get('createUser')?.value) {
+        <div class="space-y-2">
+          <label for="angajat-user-email" class="text-xs font-medium text-neutral-600">Email utilizator (opțional)</label>
+          <input z-input id="angajat-user-email" formControlName="userEmail" placeholder="Auto-generat din nume dacă lipsește" class="text-sm" />
+          <p class="text-xs text-neutral-500">Parola implicită: Angajat123!</p>
+        </div>
+      }
+    </div>
+  }
+
   @if (formError()) {
     <z-alert zType="destructive" [zDescription]="formError()!" />
   }

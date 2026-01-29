@@ -11,11 +11,34 @@ public class ProiecteService : IProiecteService
 
     public ProiecteService(AppDbContext db) => _db = db;
 
-    public async Task<IEnumerable<ProiectDto>> GetAllAsync(string? stare = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProiectDto>> GetAllAsync(int? userId = null, string? userRole = null, string? stare = null, CancellationToken cancellationToken = default)
     {
-        var q = _db.Proiecte.AsNoTracking();
+        IQueryable<Proiect> q = _db.Proiecte.AsNoTracking();
+
+        // Filtrare pentru utilizatori normali - doar proiecte unde echipa lor lucrează
+        if (userId.HasValue && userRole == "User")
+        {
+            var utilizator = await _db.Utilizatori
+                .AsNoTracking()
+                .Include(u => u.Angajat)
+                .FirstOrDefaultAsync(u => u.Id == userId.Value, cancellationToken);
+
+            if (utilizator?.Angajat?.EchipaId != null)
+            {
+                var echipaId = utilizator.Angajat.EchipaId.Value;
+                // Proiecte care au santiere cu lucrări unde echipa utilizatorului participă
+                q = q.Where(p => p.Santier.Any(s => s.Lucrari.Any(l => l.Echipe.Any(e => e.Id == echipaId))));
+            }
+            else
+            {
+                // Dacă utilizatorul nu are angajat sau angajatul nu are echipă, nu vede nimic
+                return new List<ProiectDto>();
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(stare))
             q = q.Where(p => p.Stare == stare);
+
         return await q.OrderBy(p => p.Nume)
             .Select(p => new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare })
             .ToListAsync(cancellationToken);

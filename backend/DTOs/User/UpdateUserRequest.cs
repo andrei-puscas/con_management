@@ -12,4 +12,6 @@ public class UpdateUserRequest
 
     [RegularExpression(@"^(Admin|Manager|User)$", ErrorMessage = "Rol: Admin, Manager sau User")]
     public string? Rol { get; set; }
+
+    public int? AngajatId { get; set; }
 }

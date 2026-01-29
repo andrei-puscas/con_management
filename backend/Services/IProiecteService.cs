@@ -4,7 +4,7 @@ namespace Backend.Services;
 
 public interface IProiecteService
 {
-    Task<IEnumerable<ProiectDto>> GetAllAsync(string? stare = null, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProiectDto>> GetAllAsync(int? userId = null, string? userRole = null, string? stare = null, CancellationToken cancellationToken = default);
     Task<ProiectDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<ProiectDto> CreateAsync(CreateProiectRequest request, CancellationToken cancellationToken = default);
     Task<ProiectDto?> UpdateAsync(int id, UpdateProiectRequest request, CancellationToken cancellationToken = default);

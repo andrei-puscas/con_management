@@ -2,6 +2,7 @@ using Backend.DTOs.Proiect;
 using Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers;
 
@@ -18,7 +19,11 @@ public class ProiecteController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<ProiectDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll([FromQuery] string? stare, CancellationToken cancellationToken)
     {
-        var list = await _service.GetAllAsync(stare, cancellationToken);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = userIdClaim != null && int.TryParse(userIdClaim, out var id) ? id : (int?)null;
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        var list = await _service.GetAllAsync(userId, userRole, stare, cancellationToken);
         return Ok(list);
     }
 

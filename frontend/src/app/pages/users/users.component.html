@@ -19,6 +19,7 @@
             <th z-table-head>ID</th>
             <th z-table-head>Email</th>
             <th z-table-head>Rol</th>
+            <th z-table-head>Angajat</th>
             <th z-table-head class="w-40 text-right">Acțiuni</th>
           </tr>
         </thead>
@@ -28,6 +29,13 @@
               <td z-table-cell>{{ u.id }}</td>
               <td z-table-cell>{{ u.email }}</td>
               <td z-table-cell>{{ u.rol }}</td>
+              <td z-table-cell>
+                @if (u.angajatNume) {
+                  <span class="text-sm">{{ u.angajatNume }}</span>
+                } @else {
+                  <span class="text-neutral-400">—</span>
+                }
+              </td>
               <td z-table-cell class="text-right">
                 <div class="flex flex-wrap justify-end gap-1">
                   <button z-button zType="ghost" zSize="sm" (click)="openEdit(u)">Editează</button>
@@ -37,7 +45,7 @@
             </tr>
           } @empty {
             <tr z-table-row>
-              <td z-table-cell colspan="4" class="text-center text-neutral-500">
+              <td z-table-cell colspan="5" class="text-center text-neutral-500">
                 Niciun utilizator găsit.
               </td>
             </tr>

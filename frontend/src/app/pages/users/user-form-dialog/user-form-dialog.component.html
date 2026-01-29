@@ -43,6 +43,22 @@
       <p class="text-sm text-red-600">Parola minim 6 caractere.</p>
     }
   </div>
+
+  <div class="space-y-2">
+    <label for="dialog-user-angajat" class="text-sm font-medium text-neutral-700">Angajat asociat (opțional)</label>
+    <select
+      id="dialog-user-angajat"
+      formControlName="angajatId"
+      class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+    >
+      <option [ngValue]="null">— Niciun angajat —</option>
+      @for (a of angajati(); track a.id) {
+        <option [ngValue]="a.id">{{ a.nume }}</option>
+      }
+    </select>
+    <p class="text-xs text-neutral-500">Asociază acest utilizator cu un angajat existent.</p>
+  </div>
+
   @if (formError()) {
     <z-alert zType="destructive" [zDescription]="formError()!" />
   }

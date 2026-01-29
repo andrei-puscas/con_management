@@ -15,3 +15,5 @@ frontend/dist
 frontend/.angular
 frontend/out-tsc
 frontend/.vscode
+
+/nul

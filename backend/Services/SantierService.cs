@@ -11,11 +11,32 @@ public class SantierService : ISantierService
 
     public SantierService(AppDbContext db) => _db = db;
 
-    public async Task<IEnumerable<SantierDto>> GetAllAsync(int? proiectId = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<SantierDto>> GetAllAsync(int? userId = null, string? userRole = null, int? proiectId = null, CancellationToken cancellationToken = default)
     {
-        var q = _db.Santier.AsNoTracking();
+        IQueryable<Santier> q = _db.Santier.AsNoTracking();
+
+        // Filtrare pentru utilizatori normali - doar santiere unde echipa lor lucrează
+        if (userId.HasValue && userRole == "User")
+        {
+            var utilizator = await _db.Utilizatori
+                .AsNoTracking()
+                .Include(u => u.Angajat)
+                .FirstOrDefaultAsync(u => u.Id == userId.Value, cancellationToken);
+
+            if (utilizator?.Angajat?.EchipaId != null)
+            {
+                var echipaId = utilizator.Angajat.EchipaId.Value;
+                q = q.Where(s => s.Lucrari.Any(l => l.Echipe.Any(e => e.Id == echipaId)));
+            }
+            else
+            {
+                return new List<SantierDto>();
+            }
+        }
+
         if (proiectId.HasValue)
             q = q.Where(s => s.ProiectId == proiectId.Value);
+
         return await q.OrderBy(s => s.Adresa)
             .Select(s => new SantierDto { Id = s.Id, ProiectId = s.ProiectId, Adresa = s.Adresa, Descriere = s.Descriere })
             .ToListAsync(cancellationToken);

@@ -21,6 +21,7 @@ export interface UpdateUserRequest {
   email?: string;
   password?: string;
   rol?: string;
+  angajatId?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })

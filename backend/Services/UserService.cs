@@ -84,6 +84,25 @@ public class UserService : IUserService
         if (request.Rol != null)
             user.Rol = request.Rol;
 
+        // Actualizare AngajatId (poate fi null pentru a șterge asocierea)
+        if (request.AngajatId.HasValue)
+        {
+            // Verifică dacă angajatul există
+            if (!await _db.Angajati.AnyAsync(a => a.Id == request.AngajatId.Value, cancellationToken))
+                throw new InvalidOperationException("Angajatul selectat nu există.");
+            
+            // Verifică dacă angajatul nu e deja asociat altui utilizator
+            var existingUser = await _db.Utilizatori.FirstOrDefaultAsync(u => u.AngajatId == request.AngajatId.Value && u.Id != id, cancellationToken);
+            if (existingUser != null)
+                throw new InvalidOperationException($"Angajatul este deja asociat utilizatorului {existingUser.Email}.");
+            
+            user.AngajatId = request.AngajatId.Value;
+        }
+        else if (request.AngajatId == null)
+        {
+            user.AngajatId = null;
+        }
+
         await _db.SaveChangesAsync(cancellationToken);
         var angajat = user.AngajatId.HasValue ? await _db.Angajati.FindAsync([user.AngajatId.Value], cancellationToken) : null;
         return new UserDto

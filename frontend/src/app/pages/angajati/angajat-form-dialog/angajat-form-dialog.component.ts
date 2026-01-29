@@ -38,12 +38,15 @@ export class AngajatFormDialogComponent implements OnInit {
   saving = signal(false);
   echipe = signal<{ id: number; nume: string }[]>([]);
   readonly isEditMode = this.data.angajat !== null;
+  readonly isEdit = this.data.angajat !== null;
 
   form = this.fb.nonNullable.group({
     nume: ['', Validators.required],
     rol: ['', Validators.required],
     competente: [''],
     echipaId: [null as number | null],
+    createUser: [true],
+    userEmail: [''],
   });
 
   ngOnInit(): void {
@@ -86,7 +89,14 @@ export class AngajatFormDialogComponent implements OnInit {
       });
     } else {
       this.saving.set(true);
-      this.angajatiService.create({ nume: v.nume, rol: v.rol, competente: v.competente || null, echipaId: v.echipaId }).subscribe({
+      this.angajatiService.create({
+        nume: v.nume,
+        rol: v.rol,
+        competente: v.competente || null,
+        echipaId: v.echipaId,
+        createUser: v.createUser,
+        userEmail: v.userEmail || null,
+      }).subscribe({
         next: (created) => {
           this.saving.set(false);
           if (created) {

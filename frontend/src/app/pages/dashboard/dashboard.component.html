@@ -84,8 +84,8 @@
         </div>
       </div>
 
-      <!-- Lucrări cu deadline depășit -->
-      @if (lucrariDeadlineDepasit().length > 0) {
+      <!-- Lucrări cu deadline depășit (doar Manager/Admin) -->
+      @if (auth.isManagerOrAdmin() && lucrariDeadlineDepasit().length > 0) {
         <div class="min-w-0 rounded-lg border border-red-300 bg-red-50 p-3 sm:p-4">
           <h3 class="text-sm font-semibold text-red-900 sm:text-base">🚨 Deadline-uri depășite</h3>
           <p class="mt-0.5 text-[10px] text-red-700 sm:text-xs">Lucrări care au depășit termenul și nu sunt finalizate</p>
@@ -114,8 +114,8 @@
         </div>
       }
 
-      <!-- Lucrări cu deadline apropiat -->
-      @if (lucrariDeadlineAproape().length > 0) {
+      <!-- Lucrări cu deadline apropiat (doar Manager/Admin) -->
+      @if (auth.isManagerOrAdmin() && lucrariDeadlineAproape().length > 0) {
         <div class="min-w-0 rounded-lg border border-orange-200 bg-orange-50/50 p-3 sm:p-4">
           <h3 class="text-sm font-semibold text-neutral-900 sm:text-base">⚠️ Deadline-uri apropiate</h3>
           <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Lucrări care trebuie finalizate în următoarele 7 zile</p>
