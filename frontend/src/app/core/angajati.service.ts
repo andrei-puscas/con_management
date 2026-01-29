@@ -10,6 +10,8 @@ export interface AngajatDto {
   nume: string;
   rol: string;
   competente: string | null;
+  hasUser: boolean;
+  userEmail: string | null;
 }
 
 export interface CreateAngajatRequest {
@@ -17,6 +19,8 @@ export interface CreateAngajatRequest {
   rol: string;
   competente?: string | null;
   echipaId?: number | null;
+  createUser?: boolean;
+  userEmail?: string | null;
 }
 
 export interface UpdateAngajatRequest {

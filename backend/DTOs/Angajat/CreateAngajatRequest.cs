@@ -16,4 +16,11 @@ public class CreateAngajatRequest
     public string? Competente { get; set; }
 
     public int? EchipaId { get; set; }
+
+    // Dacă se dorește crearea automată a unui utilizator
+    public bool CreateUser { get; set; } = true;
+
+    [EmailAddress(ErrorMessage = "Email invalid")]
+    [StringLength(100)]
+    public string? UserEmail { get; set; }
 }

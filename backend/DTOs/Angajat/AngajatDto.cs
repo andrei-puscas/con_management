@@ -8,4 +8,6 @@ public class AngajatDto
     public string Nume { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty;
     public string? Competente { get; set; }
+    public bool HasUser { get; set; }
+    public string? UserEmail { get; set; }
 }

@@ -5,4 +5,6 @@ public class UserDto
     public int Id { get; set; }
     public string Email { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty;
+    public int? AngajatId { get; set; }
+    public string? AngajatNume { get; set; }
 }

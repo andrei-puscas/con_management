@@ -7,6 +7,8 @@ export interface UserDto {
   id: number;
   email: string;
   rol: string;
+  angajatId: number | null;
+  angajatNume: string | null;
 }
 
 export interface CreateUserRequest {

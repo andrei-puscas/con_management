@@ -13,13 +13,13 @@
     <z-alert zType="destructive" [zDescription]="error()!" />
   } @else {
     <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
-      <table z-table class="min-w-[600px]">
+      <table z-table class="min-w-[700px]">
         <thead z-table-header>
           <tr z-table-row>
             <th z-table-head>Nume</th>
             <th z-table-head>Rol</th>
             <th z-table-head>Echipă</th>
-            <th z-table-head>Competențe</th>
+            <th z-table-head>Utilizator</th>
             <th z-table-head class="w-40 text-right">Acțiuni</th>
           </tr>
         </thead>
@@ -27,9 +27,23 @@
           @for (a of angajati(); track a.id) {
             <tr z-table-row>
               <td z-table-cell class="font-medium">{{ a.nume }}</td>
-              <td z-table-cell>{{ a.rol }}</td>
+              <td z-table-cell>
+                <div class="text-sm">{{ a.rol }}</div>
+                @if (a.competente) {
+                  <div class="mt-0.5 text-xs text-neutral-500">{{ a.competente }}</div>
+                }
+              </td>
               <td z-table-cell>{{ a.echipaNume || '—' }}</td>
-              <td z-table-cell>{{ a.competente || '—' }}</td>
+              <td z-table-cell>
+                @if (a.hasUser && a.userEmail) {
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-green-600">✓</span>
+                    <span class="text-sm">{{ a.userEmail }}</span>
+                  </div>
+                } @else {
+                  <span class="text-neutral-400">—</span>
+                }
+              </td>
               <td z-table-cell class="text-right">
                 <div class="flex flex-wrap justify-end gap-1">
                   <button z-button zType="ghost" zSize="sm" (click)="openEdit(a)">Editează</button>

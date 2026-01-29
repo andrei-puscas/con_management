@@ -6,4 +6,7 @@ public class Utilizator
     public string Email { get; set; } = string.Empty;
     public string ParolaHash { get; set; } = string.Empty;
     public string Rol { get; set; } = string.Empty; // Admin, Manager, User
+    public int? AngajatId { get; set; }
+
+    public Angajat? Angajat { get; set; }
 }

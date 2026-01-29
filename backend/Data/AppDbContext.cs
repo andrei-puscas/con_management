@@ -19,6 +19,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Utilizator>(e =>
         {
             e.HasIndex(u => u.Email).IsUnique();
+            e.HasOne(u => u.Angajat)
+                .WithOne(a => a.Utilizator)
+                .HasForeignKey<Utilizator>(u => u.AngajatId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<Santier>(e =>

@@ -9,4 +9,5 @@ public class Angajat
     public string? Competente { get; set; }
 
     public Echipa? Echipa { get; set; }
+    public Utilizator? Utilizator { get; set; }
 }
