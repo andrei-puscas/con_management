@@ -51,10 +51,11 @@ public class AppDbContext : DbContext
                 .WithMany(s => s.Lucrari)
                 .HasForeignKey(l => l.SantierId)
                 .OnDelete(DeleteBehavior.Restrict);
-            e.HasOne(l => l.Echipa)
-                .WithMany(ec => ec.Lucrari)
-                .HasForeignKey(l => l.EchipaId)
-                .OnDelete(DeleteBehavior.SetNull);
         });
+
+        modelBuilder.Entity<Lucrare>()
+            .HasMany(l => l.Echipe)
+            .WithMany(e => e.Lucrari)
+            .UsingEntity(j => j.ToTable("LucrareEchipa"));
     }
 }

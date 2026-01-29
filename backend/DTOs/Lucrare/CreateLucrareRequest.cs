@@ -7,7 +7,8 @@ public class CreateLucrareRequest
     [Required(ErrorMessage = "SantierId obligatoriu")]
     public int SantierId { get; set; }
 
-    public int? EchipaId { get; set; }
+    /// <summary>Id-uri echipe asignate la lucrare (una sau mai multe).</summary>
+    public List<int> EchipaIds { get; set; } = new();
 
     [Required(ErrorMessage = "Descriere obligatorie")]
     [StringLength(1000)]

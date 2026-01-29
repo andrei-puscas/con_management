@@ -5,7 +5,7 @@ namespace Backend.DTOs.Lucrare;
 public class UpdateLucrareRequest
 {
     public int? SantierId { get; set; }
-    public int? EchipaId { get; set; }
+    public List<int>? EchipaIds { get; set; }
 
     [StringLength(1000)]
     public string? Descriere { get; set; }
