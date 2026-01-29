@@ -1,13 +1,21 @@
+using Backend.Data;
+using Backend.Entities;
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -41,11 +49,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Entity Framework - DbContext va fi adăugat în Faza 2/3
-// builder.Services.AddDbContext<AppDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// JWT Authentication - configurare de bază (cheia și validarea vor folosi appsettings)
+// JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "CheieSecretaFoarteLungaPentruDevelopmentDoar";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "ConManagement";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -58,7 +62,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtIssuer,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            RoleClaimType = ClaimTypes.Role // tipul claim-ului de rol din JWT (URI complet)
         };
     });
 
@@ -70,11 +75,32 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+// Aplicare migrații și seed admin (dacă nu există utilizatori)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+    if (!await db.Utilizatori.AnyAsync())
+    {
+        db.Utilizatori.Add(new Utilizator
+        {
+            Email = "admin@conmanagement.local",
+            ParolaHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+            Rol = "Admin"
+        });
+        await db.SaveChangesAsync();
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwagger(c => c.RouteTemplate = "api/swagger/{documentName}/swagger.json");
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "ConManagement API v1");
+        c.RoutePrefix = "api/swagger";
+    });
 }
 
 app.UseCors();
