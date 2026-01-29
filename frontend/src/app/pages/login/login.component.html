@@ -1,0 +1,54 @@
+<div class="flex min-h-[calc(100vh-6rem)] w-full items-center justify-center px-3 py-6 sm:min-h-[calc(100vh-8rem)] sm:px-4 sm:py-8">
+  <div class="w-full max-w-md min-w-0">
+    <z-card zTitle="ConManagement" zDescription="Autentificare">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+        <div class="space-y-2">
+          <label for="email" class="text-sm font-medium text-neutral-700">Email</label>
+          <input
+            z-input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="admin@conmanagement.local"
+            [zStatus]="form.get('email')?.invalid && form.get('email')?.touched ? 'error' : undefined"
+          />
+          @if (form.get('email')?.invalid && form.get('email')?.touched) {
+            <p class="text-sm text-red-600">Introdu un email valid.</p>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label for="password" class="text-sm font-medium text-neutral-700">Parolă</label>
+          <input
+            z-input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+            [zStatus]="form.get('password')?.invalid && form.get('password')?.touched ? 'error' : undefined"
+          />
+          @if (form.get('password')?.invalid && form.get('password')?.touched) {
+            <p class="text-sm text-red-600">Parola este obligatorie.</p>
+          }
+        </div>
+
+        @if (errorMessage) {
+          <z-alert zType="destructive" [zDescription]="errorMessage" />
+        }
+
+        <button
+          z-button
+          type="submit"
+          zType="default"
+          zFull
+          [zLoading]="loading"
+          [zDisabled]="form.invalid || loading"
+        >
+          {{ loading ? 'Se verifică...' : 'Autentificare' }}
+        </button>
+      </form>
+    </z-card>
+  </div>
+</div>

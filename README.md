@@ -25,6 +25,9 @@ npm install
 npm start
 ```
 
-Pornesc în paralel API-ul (http://localhost:5000) și frontend-ul (http://localhost:4200). Oprire cu Ctrl+C.
+Pornește **doar frontend-ul** (http://localhost:4200). Oprire cu Ctrl+C.
+
+- **API (backend):** `npm run api` sau `cd backend && dotnet run` → http://localhost:5000
+- **Frontend + API:** `npm run start:all` (pornește ambele în paralel)
 
 **Prima rulare:** în `backend` rulează `dotnet restore`, în `frontend` rulează `npm install` (sau rulezi manual când e nevoie)

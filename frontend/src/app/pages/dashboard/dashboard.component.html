@@ -1,0 +1,42 @@
+<z-card zTitle="Dashboard" zDescription="Bine ai venit în aplicația ConManagement">
+  <div class="min-w-0 space-y-4">
+    <p class="text-neutral-600 text-sm sm:text-base">
+      Acesta este panoul principal de control. Funcționalitățile vor fi adăugate în fazele următoare ale proiectului.
+    </p>
+
+    <div
+      class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-4"
+      [class.lg:grid-cols-3]="!auth.isAdmin()"
+      [class.lg:grid-cols-4]="auth.isAdmin()"
+    >
+      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
+        <h3 class="text-sm font-medium text-neutral-900">Proiecte</h3>
+        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
+      </div>
+
+      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
+        <h3 class="text-sm font-medium text-neutral-900">Șantiere</h3>
+        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
+      </div>
+
+      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
+        <h3 class="text-sm font-medium text-neutral-900">Echipe</h3>
+        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
+      </div>
+
+      @if (auth.isAdmin()) {
+        <a routerLink="/users" class="min-w-0 rounded-lg border border-neutral-200 p-4 transition-colors hover:border-primary/50 hover:bg-neutral-50">
+          <h3 class="text-sm font-medium text-neutral-900">Utilizatori</h3>
+          @if (usersCount() === null) {
+            <div class="mt-2 flex items-center gap-2">
+              <z-loader zSize="sm" />
+              <span class="text-neutral-500">...</span>
+            </div>
+          } @else {
+            <p class="mt-2 text-2xl font-semibold text-neutral-900">{{ usersCount() }}</p>
+          }
+        </a>
+      }
+    </div>
+  </div>
+</z-card>

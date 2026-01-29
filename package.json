@@ -5,9 +5,10 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "start": "concurrently -n api,web -c cyan,green \"npm run api\" \"npm run frontend\"",
+    "start": "npm start --prefix frontend",
     "api": "dotnet run --project backend",
-    "frontend": "npm start --prefix frontend"
+    "frontend": "npm start --prefix frontend",
+    "start:all": "concurrently -n api,web -c cyan,green \"npm run api\" \"npm run frontend\""
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

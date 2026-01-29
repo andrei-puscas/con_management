@@ -1,24 +1,25 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from './core/auth.service';
+import { ZardButtonComponent } from '@/shared/components/button';
+import { ZardAvatarComponent } from '@/shared/components/avatar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  template: `
-    <div class="min-h-screen bg-gray-50">
-      <header class="bg-white shadow">
-        <div class="mx-auto max-w-7xl px-4 py-4">
-          <h1 class="text-xl font-semibold text-gray-800">ConManagement</h1>
-        </div>
-      </header>
-      <main class="mx-auto max-w-7xl px-4 py-6">
-        <router-outlet />
-      </main>
-    </div>
-  `,
-  styles: [],
+  imports: [RouterOutlet, RouterLink, ZardButtonComponent, ZardAvatarComponent],
+  templateUrl: './app.component.html',
 })
 export class AppComponent {
   title = 'ConManagement';
+  private router = inject(Router);
+  constructor(readonly auth: AuthService) {}
+
+  get breadcrumbItems(): { label: string; link: string }[] {
+    const url = this.router.url;
+    if (url.startsWith('/users')) return [{ label: 'Dashboard', link: '/dashboard' }, { label: 'Utilizatori', link: '/users' }];
+    if (url.startsWith('/dashboard')) return [{ label: 'Dashboard', link: '/dashboard' }];
+    if (url.startsWith('/login')) return [{ label: 'Autentificare', link: '/login' }];
+    return [{ label: 'Dashboard', link: '/dashboard' }];
+  }
 }
