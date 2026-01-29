@@ -1,42 +1,162 @@
 <z-card zTitle="Dashboard" zDescription="Bine ai venit în aplicația ConManagement">
-  <div class="min-w-0 space-y-4">
-    <p class="text-neutral-600 text-sm sm:text-base">
-      Acesta este panoul principal de control. Funcționalitățile vor fi adăugate în fazele următoare ale proiectului.
-    </p>
+  @if (loading()) {
+    <div class="flex items-center justify-center py-12">
+      <z-loader zSize="lg" />
+    </div>
+  } @else if (error()) {
+    <z-alert zType="destructive" [zDescription]="error()!" />
+  } @else {
+    <div class="min-w-0 space-y-3 sm:space-y-4">
+      <!-- Statistici principale -->
+      <div
+        class="grid min-w-0 gap-2 sm:gap-3"
+        [class.grid-cols-2]="!auth.isManagerOrAdmin() && !auth.isAdmin()"
+        [class.sm:grid-cols-2]="!auth.isManagerOrAdmin() && !auth.isAdmin()"
+        [class.grid-cols-2]="auth.isManagerOrAdmin() && !auth.isAdmin()"
+        [class.sm:grid-cols-3]="auth.isManagerOrAdmin() && !auth.isAdmin()"
+        [class.grid-cols-2]="auth.isAdmin()"
+        [class.sm:grid-cols-4]="auth.isAdmin()"
+      >
+        <a routerLink="/proiecte" class="min-w-0 rounded-lg border border-neutral-200 p-3 transition-colors hover:border-primary/50 hover:bg-neutral-50">
+          <h3 class="text-xs font-medium text-neutral-600">Proiecte active</h3>
+          <p class="mt-1.5 text-xl font-semibold text-neutral-900 sm:text-2xl">{{ proiecteActive() }}</p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">Total: {{ proiecte().length }}</p>
+        </a>
 
-    <div
-      class="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:gap-4"
-      [class.lg:grid-cols-3]="!auth.isAdmin()"
-      [class.lg:grid-cols-4]="auth.isAdmin()"
-    >
-      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
-        <h3 class="text-sm font-medium text-neutral-900">Proiecte</h3>
-        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
+        <div class="min-w-0 rounded-lg border border-neutral-200 p-3">
+          <h3 class="text-xs font-medium text-neutral-600">Șantiere</h3>
+          <p class="mt-1.5 text-xl font-semibold text-neutral-900 sm:text-2xl">{{ santiere().length }}</p>
+          <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">{{ proiecte().length }} proiecte</p>
+        </div>
+
+        @if (auth.isManagerOrAdmin()) {
+          <a routerLink="/echipe" class="min-w-0 rounded-lg border border-neutral-200 p-3 transition-colors hover:border-primary/50 hover:bg-neutral-50">
+            <h3 class="text-xs font-medium text-neutral-600">Echipe</h3>
+            <p class="mt-1.5 text-xl font-semibold text-neutral-900 sm:text-2xl">{{ echipe().length }}</p>
+            <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">{{ angajatiCount() }} angajați</p>
+          </a>
+        }
+
+        @if (auth.isAdmin()) {
+          <a routerLink="/users" class="min-w-0 rounded-lg border border-neutral-200 p-3 transition-colors hover:border-primary/50 hover:bg-neutral-50">
+            <h3 class="text-xs font-medium text-neutral-600">Utilizatori</h3>
+            <p class="mt-1.5 text-xl font-semibold text-neutral-900 sm:text-2xl">{{ usersCount() ?? 0 }}</p>
+            <p class="mt-0.5 text-[10px] text-neutral-500 sm:text-xs">În sistem</p>
+          </a>
+        }
       </div>
 
-      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
-        <h3 class="text-sm font-medium text-neutral-900">Șantiere</h3>
-        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
-      </div>
+      <!-- Progress lucrări -->
+      <div class="min-w-0 rounded-lg border border-neutral-200 p-3 sm:p-4">
+        <h3 class="text-sm font-semibold text-neutral-900 sm:text-base">Progres lucrări</h3>
+        <div class="mt-3 space-y-3">
+          <div class="grid grid-cols-3 gap-2 sm:gap-3">
+            <div class="text-center">
+              <p class="text-lg font-semibold text-blue-600 sm:text-xl">{{ lucrariPlanificate() }}</p>
+              <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Planificate</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-semibold text-orange-600 sm:text-xl">{{ lucrariInLucru() }}</p>
+              <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">În lucru</p>
+            </div>
+            <div class="text-center">
+              <p class="text-lg font-semibold text-green-600 sm:text-xl">{{ lucrariFinalizate() }}</p>
+              <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Finalizate</p>
+            </div>
+          </div>
 
-      <div class="min-w-0 rounded-lg border border-neutral-200 p-4">
-        <h3 class="text-sm font-medium text-neutral-900">Echipe</h3>
-        <p class="mt-2 text-xl font-semibold text-neutral-900 sm:text-2xl">0</p>
-      </div>
-
-      @if (auth.isAdmin()) {
-        <a routerLink="/users" class="min-w-0 rounded-lg border border-neutral-200 p-4 transition-colors hover:border-primary/50 hover:bg-neutral-50">
-          <h3 class="text-sm font-medium text-neutral-900">Utilizatori</h3>
-          @if (usersCount() === null) {
-            <div class="mt-2 flex items-center gap-2">
-              <z-loader zSize="sm" />
-              <span class="text-neutral-500">...</span>
+          @if (totalLucrari() > 0) {
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between text-xs sm:text-sm">
+                <span class="text-neutral-600">Progres general</span>
+                <span class="font-semibold text-neutral-900">{{ procentFinalizat() }}%</span>
+              </div>
+              <div class="h-2.5 w-full overflow-hidden rounded-full bg-neutral-200">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500"
+                  [style.width.%]="procentFinalizat()"
+                ></div>
+              </div>
             </div>
           } @else {
-            <p class="mt-2 text-2xl font-semibold text-neutral-900">{{ usersCount() }}</p>
+            <p class="text-center text-xs text-neutral-500 sm:text-sm">Nicio lucrare adăugată încă.</p>
           }
-        </a>
+        </div>
+      </div>
+
+      <!-- Lucrări cu deadline depășit -->
+      @if (lucrariDeadlineDepasit().length > 0) {
+        <div class="min-w-0 rounded-lg border border-red-300 bg-red-50 p-3 sm:p-4">
+          <h3 class="text-sm font-semibold text-red-900 sm:text-base">🚨 Deadline-uri depășite</h3>
+          <p class="mt-0.5 text-[10px] text-red-700 sm:text-xs">Lucrări care au depășit termenul și nu sunt finalizate</p>
+          <div class="mt-2 space-y-2 sm:mt-3 sm:space-y-2.5">
+            @for (l of lucrariDeadlineDepasit(); track l.id) {
+              <div class="flex min-w-0 items-start justify-between gap-2 rounded-lg border border-red-300 bg-white p-2 sm:gap-3 sm:p-2.5">
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-xs font-medium text-neutral-900 sm:text-sm">{{ l.descriere }}</p>
+                  <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10px] text-neutral-600 sm:gap-2 sm:text-xs">
+                    <span>{{ l.stare }}</span>
+                    @if (l.echipeNume) {
+                      <span>·</span>
+                      <span>{{ l.echipeNume }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="shrink-0 text-right">
+                  <p class="text-xs font-semibold text-red-600 sm:text-sm">
+                    {{ -getDaysUntil(l.termen) }}z
+                  </p>
+                  <p class="mt-0.5 text-[10px] text-neutral-500">{{ l.termen | date:'dd.MM' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
       }
+
+      <!-- Lucrări cu deadline apropiat -->
+      @if (lucrariDeadlineAproape().length > 0) {
+        <div class="min-w-0 rounded-lg border border-orange-200 bg-orange-50/50 p-3 sm:p-4">
+          <h3 class="text-sm font-semibold text-neutral-900 sm:text-base">⚠️ Deadline-uri apropiate</h3>
+          <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Lucrări care trebuie finalizate în următoarele 7 zile</p>
+          <div class="mt-2 space-y-2 sm:mt-3 sm:space-y-2.5">
+            @for (l of lucrariDeadlineAproape(); track l.id) {
+              <div class="flex min-w-0 items-start justify-between gap-2 rounded-lg border border-orange-200 bg-white p-2 sm:gap-3 sm:p-2.5">
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-xs font-medium text-neutral-900 sm:text-sm">{{ l.descriere }}</p>
+                  <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10px] text-neutral-600 sm:gap-2 sm:text-xs">
+                    <span>{{ l.stare }}</span>
+                    @if (l.echipeNume) {
+                      <span>·</span>
+                      <span>{{ l.echipeNume }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="shrink-0 text-right">
+                  <p class="text-xs font-semibold text-orange-600 sm:text-sm">
+                    {{ getDaysUntil(l.termen) }}z
+                  </p>
+                  <p class="mt-0.5 text-[10px] text-neutral-500">{{ l.termen | date:'dd.MM' }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Link-uri rapide -->
+      <div class="grid min-w-0 gap-2 sm:gap-3" [class.grid-cols-1]="!auth.isManagerOrAdmin()" [class.grid-cols-1]="auth.isManagerOrAdmin()" [class.sm:grid-cols-2]="auth.isManagerOrAdmin()">
+        <a routerLink="/proiecte" class="group min-w-0 rounded-lg border border-neutral-200 p-3 transition-all hover:border-primary hover:shadow-md">
+          <h4 class="text-xs font-medium text-neutral-900 group-hover:text-primary sm:text-sm">📁 Gestionează proiecte</h4>
+          <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Adaugă proiecte, șantiere și lucrări</p>
+        </a>
+        @if (auth.isManagerOrAdmin()) {
+          <a routerLink="/echipe" class="group min-w-0 rounded-lg border border-neutral-200 p-3 transition-all hover:border-primary hover:shadow-md">
+            <h4 class="text-xs font-medium text-neutral-900 group-hover:text-primary sm:text-sm">👥 Gestionează echipe</h4>
+            <p class="mt-0.5 text-[10px] text-neutral-600 sm:text-xs">Organizează echipe și angajați</p>
+          </a>
+        }
+      </div>
     </div>
-  </div>
+  }
 </z-card>

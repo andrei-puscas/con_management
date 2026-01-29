@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { UsersService, type UserDto } from '../../core/users.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { UserFormDialogComponent } from './user-form-dialog/user-form-dialog.component';
@@ -22,7 +21,6 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     ZardCardComponent,
     ZardButtonComponent,
     ZardLoaderComponent,

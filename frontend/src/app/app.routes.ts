@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
+import { managerGuard } from './core/manager.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -32,12 +33,12 @@ export const routes: Routes = [
   {
     path: 'echipe',
     loadComponent: () => import('./pages/echipe/echipe.component').then(m => m.EchipeComponent),
-    canActivate: [authGuard],
+    canActivate: [authGuard, managerGuard],
   },
   {
     path: 'angajati',
     loadComponent: () => import('./pages/angajati/angajati.component').then(m => m.AngajatiComponent),
-    canActivate: [authGuard],
+    canActivate: [authGuard, managerGuard],
   },
   { path: '**', redirectTo: 'dashboard' },
 ];

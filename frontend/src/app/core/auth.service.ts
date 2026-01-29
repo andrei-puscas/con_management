@@ -31,6 +31,10 @@ export class AuthService {
   readonly role = this.roleSignal.asReadonly();
   readonly email = this.emailSignal.asReadonly();
   readonly isAdmin = () => this.roleSignal() === 'Admin';
+  readonly isManagerOrAdmin = () => {
+    const role = this.roleSignal();
+    return role === 'Admin' || role === 'Manager';
+  };
 
   getEmail(): string | null {
     return this.emailSignal() ?? (typeof localStorage !== 'undefined' ? localStorage.getItem(EMAIL_KEY) : null);
