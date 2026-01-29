@@ -1,0 +1,17 @@
+plan
+proiect
+
+# Backend (.NET)
+backend/bin
+backend/obj
+backend/.vs
+
+# Root (npm scripts)
+node_modules
+
+# Frontend (Angular)
+frontend/node_modules
+frontend/dist
+frontend/.angular
+frontend/out-tsc
+frontend/.vscode
