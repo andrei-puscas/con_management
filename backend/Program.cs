@@ -16,6 +16,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProiecteService, ProiecteService>();
+builder.Services.AddScoped<ISantierService, SantierService>();
+builder.Services.AddScoped<IEchipeService, EchipeService>();
+builder.Services.AddScoped<IAngajatiService, AngajatiService>();
+builder.Services.AddScoped<ILucrariService, LucrariService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
