@@ -1,0 +1,22 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="min-w-0 space-y-4">
+  <div class="space-y-2">
+    <label for="echipa-nume" class="text-sm font-medium text-neutral-700">Nume echipă</label>
+    <input z-input id="echipa-nume" formControlName="nume" placeholder="Ex: Echipa 1" [zStatus]="form.get('nume')?.invalid && form.get('nume')?.touched ? 'error' : undefined" />
+  </div>
+  <div class="space-y-2">
+    <label for="echipa-sef" class="text-sm font-medium text-neutral-700">Șef echipă (opțional)</label>
+    <select id="echipa-sef" formControlName="sefEchipaId" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
+      <option [ngValue]="null">— Niciodată —</option>
+      @for (a of angajati(); track a.id) {
+        <option [ngValue]="a.id">{{ a.nume }}</option>
+      }
+    </select>
+  </div>
+  @if (formError()) {
+    <z-alert zType="destructive" [zDescription]="formError()!" />
+  }
+  <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+    <button z-button type="button" zType="outline" (click)="cancel()" [zDisabled]="saving()">Anulare</button>
+    <button z-button type="submit" zType="default" [zLoading]="saving()" [zDisabled]="form.invalid || saving()">Salvează</button>
+  </div>
+</form>

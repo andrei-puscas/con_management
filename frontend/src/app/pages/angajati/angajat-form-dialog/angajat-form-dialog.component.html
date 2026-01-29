@@ -1,0 +1,30 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="min-w-0 space-y-4">
+  <div class="space-y-2">
+    <label for="angajat-nume" class="text-sm font-medium text-neutral-700">Nume</label>
+    <input z-input id="angajat-nume" formControlName="nume" placeholder="Nume complet" [zStatus]="form.get('nume')?.invalid && form.get('nume')?.touched ? 'error' : undefined" />
+  </div>
+  <div class="space-y-2">
+    <label for="angajat-rol" class="text-sm font-medium text-neutral-700">Rol</label>
+    <input z-input id="angajat-rol" formControlName="rol" placeholder="Ex: Șef de echipă, Muncitor" [zStatus]="form.get('rol')?.invalid && form.get('rol')?.touched ? 'error' : undefined" />
+  </div>
+  <div class="space-y-2">
+    <label for="angajat-competente" class="text-sm font-medium text-neutral-700">Competențe (opțional)</label>
+    <input z-input id="angajat-competente" formControlName="competente" placeholder="Ex: zidărie, beton" />
+  </div>
+  <div class="space-y-2">
+    <label for="angajat-echipa" class="text-sm font-medium text-neutral-700">Echipă (opțional)</label>
+    <select id="angajat-echipa" formControlName="echipaId" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
+      <option [ngValue]="null">— Nicio echipă —</option>
+      @for (e of echipe(); track e.id) {
+        <option [ngValue]="e.id">{{ e.nume }}</option>
+      }
+    </select>
+  </div>
+  @if (formError()) {
+    <z-alert zType="destructive" [zDescription]="formError()!" />
+  }
+  <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+    <button z-button type="button" zType="outline" (click)="cancel()" [zDisabled]="saving()">Anulare</button>
+    <button z-button type="submit" zType="default" [zLoading]="saving()" [zDisabled]="form.invalid || saving()">Salvează</button>
+  </div>
+</form>

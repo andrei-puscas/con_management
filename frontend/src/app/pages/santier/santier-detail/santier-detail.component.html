@@ -1,0 +1,69 @@
+@if (santier(); as s) {
+  <z-card [zTitle]="s.adresa" zDescription="Șantier – adaugă și gestionează lucrări">
+    @if (s.descriere) {
+      <p class="mb-4 text-sm text-neutral-600">{{ s.descriere }}</p>
+    }
+
+    <h2 class="mb-3 text-base font-semibold text-neutral-900">Lucrări</h2>
+    <div class="mb-4 flex flex-wrap items-center justify-end gap-2">
+      <button z-button zType="default" zSize="sm" (click)="openAddLucrare()">
+        Adaugă lucrare
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="flex items-center justify-center py-8">
+        <z-loader zSize="lg" />
+      </div>
+    } @else if (error()) {
+      <z-alert zType="destructive" [zDescription]="error()!" />
+    } @else {
+      <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
+        <table z-table class="min-w-[600px]">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Descriere</th>
+              <th z-table-head>Termen</th>
+              <th z-table-head>Stare</th>
+              <th z-table-head>Echipe</th>
+              <th z-table-head class="w-40 text-right">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (l of lucrari(); track l.id) {
+              <tr z-table-row>
+                <td z-table-cell class="font-medium">{{ l.descriere }}</td>
+                <td z-table-cell>{{ l.termen | date:'dd.MM.yyyy' }}</td>
+                <td z-table-cell>{{ l.stare }}</td>
+                <td z-table-cell>{{ l.echipeNume || '—' }}</td>
+                <td z-table-cell class="text-right">
+                  <div class="flex flex-wrap justify-end gap-1">
+                    <button z-button zType="ghost" zSize="sm" (click)="openEditLucrare(l, $event)">Editează</button>
+                    <button z-button zType="destructive" zSize="sm" (click)="deleteLucrare(l, $event)">Șterge</button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr z-table-row>
+                <td z-table-cell [attr.colspan]="5" class="text-center text-neutral-500">
+                  Niciună lucrare. Adaugă o lucrare și asignează una sau mai multe echipe.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </z-card>
+} @else if (error()) {
+  <z-card zTitle="Șantier" zDescription="Detalii șantier">
+    <z-alert zType="destructive" [zDescription]="error()!" />
+    <a [routerLink]="['/proiecte', proiectId()]" class="mt-4 inline-block">
+      <button z-button zType="outline" zSize="sm">Înapoi la proiect</button>
+    </a>
+  </z-card>
+} @else {
+  <div class="flex items-center justify-center py-12">
+    <z-loader zSize="lg" />
+  </div>
+}

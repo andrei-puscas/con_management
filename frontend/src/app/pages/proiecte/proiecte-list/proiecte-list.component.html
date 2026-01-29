@@ -1,0 +1,51 @@
+<z-card zTitle="Proiecte" zDescription="Listă proiecte. Deschide un proiect pentru a gestiona șantierele.">
+  <div class="mb-4 flex min-w-0 flex-wrap items-center justify-end gap-2">
+    <button z-button zType="default" zSize="sm" (click)="openCreate()" class="shrink-0">
+      Adaugă proiect
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-8 sm:py-12">
+      <z-loader zSize="lg" />
+    </div>
+  } @else if (error()) {
+    <z-alert zType="destructive" [zDescription]="error()!" />
+  } @else {
+    <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
+      <table z-table class="min-w-[600px]">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Nume</th>
+            <th z-table-head>Client</th>
+            <th z-table-head>Data start</th>
+            <th z-table-head>Stare</th>
+            <th z-table-head class="w-40 text-right">Acțiuni</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @for (p of proiecte(); track p.id) {
+            <tr z-table-row class="cursor-pointer hover:bg-neutral-50" [routerLink]="['/proiecte', p.id]">
+              <td z-table-cell class="font-medium">{{ p.nume }}</td>
+              <td z-table-cell>{{ p.client }}</td>
+              <td z-table-cell>{{ p.dataStart | date:'dd.MM.yyyy' }}</td>
+              <td z-table-cell>{{ p.stare }}</td>
+              <td z-table-cell class="text-right" (click)="$event.stopPropagation()">
+                <div class="flex flex-wrap justify-end gap-1">
+                  <button z-button zType="ghost" zSize="sm" (click)="openEdit(p, $event)">Editează</button>
+                  <button z-button zType="destructive" zSize="sm" (click)="deleteProiect(p, $event)">Șterge</button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr z-table-row>
+              <td z-table-cell [attr.colspan]="5" class="text-center text-neutral-500">
+                Niciun proiect. Adaugă un proiect pentru a începe.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</z-card>

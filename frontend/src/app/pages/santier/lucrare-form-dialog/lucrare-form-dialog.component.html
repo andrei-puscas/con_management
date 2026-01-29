@@ -1,0 +1,43 @@
+<form [formGroup]="form" (ngSubmit)="save()" class="min-w-0 space-y-4">
+  <div class="space-y-2">
+    <label for="lucrare-descriere" class="text-sm font-medium text-neutral-700">Descriere</label>
+    <textarea id="lucrare-descriere" formControlName="descriere" rows="3" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary" placeholder="Descriere lucrare" [class.border-red-500]="form.get('descriere')?.invalid && form.get('descriere')?.touched"></textarea>
+  </div>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="space-y-2">
+      <label for="lucrare-termen" class="text-sm font-medium text-neutral-700">Termen</label>
+      <input z-input id="lucrare-termen" type="date" formControlName="termen" [zStatus]="form.get('termen')?.invalid && form.get('termen')?.touched ? 'error' : undefined" />
+    </div>
+    <div class="space-y-2">
+      <label for="lucrare-stare" class="text-sm font-medium text-neutral-700">Stare</label>
+      <select id="lucrare-stare" formControlName="stare" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
+        <option value="Planificat">Planificat</option>
+        <option value="În lucru">În lucru</option>
+        <option value="Finalizat">Finalizat</option>
+      </select>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <span class="text-sm font-medium text-neutral-700">Echipe (una sau mai multe)</span>
+    <div class="max-h-40 space-y-2 overflow-y-auto rounded-md border border-neutral-200 bg-neutral-50 p-2">
+      @for (e of echipe(); track e.id) {
+        <label class="flex cursor-pointer items-center gap-2 rounded px-2 py-1 hover:bg-white">
+          <input type="checkbox" [checked]="isEchipaSelected(e.id)" (change)="toggleEchipa(e.id)" class="rounded border-neutral-300 text-primary focus:ring-primary" />
+          <span>{{ e.nume }}</span>
+          @if (e.sefEchipaNume) {
+            <span class="text-neutral-500 text-xs">(șef: {{ e.sefEchipaNume }})</span>
+          }
+        </label>
+      } @empty {
+        <p class="text-sm text-neutral-500">Nicio echipă. Creează echipe din meniul Echipe.</p>
+      }
+    </div>
+  </div>
+  @if (formError()) {
+    <z-alert zType="destructive" [zDescription]="formError()!" />
+  }
+  <div class="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+    <button z-button type="button" zType="outline" (click)="cancel()" [zDisabled]="saving()">Anulare</button>
+    <button z-button type="submit" zType="default" [zLoading]="saving()" [zDisabled]="form.invalid || saving()">Salvează</button>
+  </div>
+</form>

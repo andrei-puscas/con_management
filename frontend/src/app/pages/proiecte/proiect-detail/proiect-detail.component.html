@@ -1,0 +1,72 @@
+@if (proiect(); as p) {
+  <z-card [zTitle]="p.nume" [zDescription]="'Client: ' + p.client + ' · Stare: ' + p.stare">
+    <div class="mb-4 text-sm text-neutral-600">
+      <span>Data start: {{ p.dataStart | date:'dd.MM.yyyy' }}</span>
+      @if (p.dataSfarsit) {
+        <span class="ml-4">Data sfârșit: {{ p.dataSfarsit | date:'dd.MM.yyyy' }}</span>
+      }
+    </div>
+
+    <h2 class="mb-3 text-base font-semibold text-neutral-900">Șantiere</h2>
+    <div class="mb-4 flex flex-wrap items-center justify-end gap-2">
+      <button z-button zType="default" zSize="sm" (click)="openAddSantier()">
+        Adaugă șantier
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="flex items-center justify-center py-8">
+        <z-loader zSize="lg" />
+      </div>
+    } @else if (error()) {
+      <z-alert zType="destructive" [zDescription]="error()!" />
+    } @else {
+      <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
+        <table z-table class="min-w-[500px]">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Adresă</th>
+              <th z-table-head>Descriere</th>
+              <th z-table-head class="w-40 text-right">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (s of santiere(); track s.id) {
+              <tr
+                z-table-row
+                class="cursor-pointer hover:bg-neutral-50"
+                [routerLink]="['/proiecte', p.id, 'santier', s.id]"
+              >
+                <td z-table-cell class="font-medium">{{ s.adresa }}</td>
+                <td z-table-cell>{{ s.descriere || '—' }}</td>
+                <td z-table-cell class="text-right" (click)="$event.stopPropagation()">
+                  <div class="flex flex-wrap justify-end gap-1">
+                    <button z-button zType="ghost" zSize="sm" (click)="openEditSantier(s, $event)">Editează</button>
+                    <button z-button zType="destructive" zSize="sm" (click)="deleteSantier(s, $event)">Șterge</button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr z-table-row>
+                <td z-table-cell [attr.colspan]="3" class="text-center text-neutral-500">
+                  Niciun șantier. Adaugă un șantier pentru a adăuga lucrări.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </z-card>
+} @else if (error()) {
+  <z-card zTitle="Proiect" zDescription="Detalii proiect">
+    <z-alert zType="destructive" [zDescription]="error()!" />
+    <a [routerLink]="['/proiecte']" class="mt-4 inline-block">
+      <button z-button zType="outline" zSize="sm">Înapoi la proiecte</button>
+    </a>
+  </z-card>
+} @else {
+  <div class="flex items-center justify-center py-12">
+    <z-loader zSize="lg" />
+  </div>
+}
