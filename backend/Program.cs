@@ -84,11 +84,20 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
-// Aplicare migrații și seed admin (dacă nu există utilizatori)
+// Aplicare migrații, asigurare coloane Buget/Moneda pe Proiecte, seed admin (dacă nu există utilizatori)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+
+    // Asigură coloanele Buget și Moneda pe Proiecte (dacă migrația nu le-a creat)
+    await db.Database.ExecuteSqlRawAsync(@"
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'Proiecte') AND name = N'Buget')
+    ALTER TABLE [Proiecte] ADD [Buget] decimal(18,2) NULL;
+IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'Proiecte') AND name = N'Moneda')
+    ALTER TABLE [Proiecte] ADD [Moneda] nvarchar(10) NULL;
+");
+
     if (!await db.Utilizatori.AnyAsync())
     {
         db.Utilizatori.Add(new Utilizator

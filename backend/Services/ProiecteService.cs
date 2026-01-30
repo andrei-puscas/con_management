@@ -40,14 +40,14 @@ public class ProiecteService : IProiecteService
             q = q.Where(p => p.Stare == stare);
 
         return await q.OrderBy(p => p.Nume)
-            .Select(p => new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare })
+            .Select(p => new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare, Buget = p.Buget, Moneda = p.Moneda })
             .ToListAsync(cancellationToken);
     }
 
     public async Task<ProiectDto?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         var p = await _db.Proiecte.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-        return p == null ? null : new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare };
+        return p == null ? null : new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare, Buget = p.Buget, Moneda = p.Moneda };
     }
 
     public async Task<ProiectDto> CreateAsync(CreateProiectRequest request, CancellationToken cancellationToken = default)
@@ -58,11 +58,13 @@ public class ProiecteService : IProiecteService
             Client = request.Client.Trim(),
             DataStart = request.DataStart,
             DataSfarsit = request.DataSfarsit,
-            Stare = request.Stare
+            Stare = request.Stare,
+            Buget = request.Buget,
+            Moneda = request.Moneda ?? (request.Buget.HasValue ? "RON" : null)
         };
         _db.Proiecte.Add(p);
         await _db.SaveChangesAsync(cancellationToken);
-        return new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare };
+        return new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare, Buget = p.Buget, Moneda = p.Moneda };
     }
 
     public async Task<ProiectDto?> UpdateAsync(int id, UpdateProiectRequest request, CancellationToken cancellationToken = default)
@@ -74,8 +76,10 @@ public class ProiecteService : IProiecteService
         if (request.DataStart.HasValue) p.DataStart = request.DataStart.Value;
         if (request.DataSfarsit.HasValue) p.DataSfarsit = request.DataSfarsit;
         if (request.Stare != null) p.Stare = request.Stare;
+        if (request.Buget.HasValue) p.Buget = request.Buget;
+        if (request.Moneda != null) p.Moneda = request.Moneda;
         await _db.SaveChangesAsync(cancellationToken);
-        return new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare };
+        return new ProiectDto { Id = p.Id, Nume = p.Nume, Client = p.Client, DataStart = p.DataStart, DataSfarsit = p.DataSfarsit, Stare = p.Stare, Buget = p.Buget, Moneda = p.Moneda };
     }
 
     public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)

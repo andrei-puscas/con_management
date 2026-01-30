@@ -16,6 +16,12 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Proiect>(e =>
+        {
+            e.Property(p => p.Buget).HasPrecision(18, 2);
+            e.Property(p => p.Moneda).HasMaxLength(10);
+        });
+
         modelBuilder.Entity<Utilizator>(e =>
         {
             e.HasIndex(u => u.Email).IsUnique();

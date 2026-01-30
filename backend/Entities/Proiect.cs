@@ -8,6 +8,8 @@ public class Proiect
     public DateTime DataStart { get; set; }
     public DateTime? DataSfarsit { get; set; }
     public string Stare { get; set; } = string.Empty; // ex: Activ, Încheiat
+    public decimal? Buget { get; set; }
+    public string? Moneda { get; set; } // RON, EUR
 
     public ICollection<Santier> Santier { get; set; } = new List<Santier>();
 }
