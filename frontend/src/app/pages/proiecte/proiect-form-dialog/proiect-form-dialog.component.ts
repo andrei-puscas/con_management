@@ -35,12 +35,14 @@ export class ProiectFormDialogComponent {
   saving = signal(false);
   readonly isEditMode = this.data.proiect !== null;
 
-  form = this.fb.nonNullable.group({
+  form = this.fb.group({
     nume: ['', Validators.required],
     client: ['', Validators.required],
     dataStart: [this.formatDateForInput(new Date()), Validators.required],
     dataSfarsit: [''],
     stare: ['Activ', Validators.required],
+    buget: [null as number | null],
+    moneda: ['RON' as 'RON' | 'EUR'],
   });
 
   constructor() {
@@ -52,6 +54,8 @@ export class ProiectFormDialogComponent {
         dataStart: this.formatDateForInput(p.dataStart),
         dataSfarsit: p.dataSfarsit ? this.formatDateForInput(p.dataSfarsit) : '',
         stare: p.stare,
+        buget: p.buget,
+        moneda: (p.moneda === 'EUR' ? 'EUR' : 'RON') as 'RON' | 'EUR',
       });
     }
   }
@@ -61,9 +65,15 @@ export class ProiectFormDialogComponent {
     return date.toISOString().slice(0, 10);
   }
 
-  private toIso(dateStr: string): string {
+  private toIso(dateStr: string | null): string {
     if (!dateStr) return '';
     return new Date(dateStr).toISOString();
+  }
+
+  private parseBuget(value: number | string | null | undefined): number | null {
+    if (value === null || value === undefined || value === '') return null;
+    const n = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(n) ? null : n;
   }
 
   cancel(): void {
@@ -77,11 +87,13 @@ export class ProiectFormDialogComponent {
       const v = this.form.getRawValue();
       this.saving.set(true);
       this.proiecteService.update(id, {
-        nume: v.nume,
-        client: v.client,
-        dataStart: this.toIso(v.dataStart),
+        nume: v.nume ?? undefined,
+        client: v.client ?? undefined,
+        dataStart: v.dataStart ? this.toIso(v.dataStart) : undefined,
         dataSfarsit: v.dataSfarsit ? this.toIso(v.dataSfarsit) : null,
-        stare: v.stare,
+        stare: v.stare ?? undefined,
+        buget: this.parseBuget(v.buget),
+        moneda: v.moneda ?? 'RON',
       }).subscribe({
         next: (updated) => {
           this.saving.set(false);
@@ -101,11 +113,13 @@ export class ProiectFormDialogComponent {
       const v = this.form.getRawValue();
       this.saving.set(true);
       this.proiecteService.create({
-        nume: v.nume,
-        client: v.client,
-        dataStart: this.toIso(v.dataStart),
+        nume: v.nume ?? '',
+        client: v.client ?? '',
+        dataStart: this.toIso(v.dataStart ?? ''),
         dataSfarsit: v.dataSfarsit ? this.toIso(v.dataSfarsit) : null,
-        stare: v.stare,
+        stare: v.stare ?? 'Activ',
+        buget: this.parseBuget(v.buget),
+        moneda: v.moneda ?? 'RON',
       }).subscribe({
         next: (created) => {
           this.saving.set(false);

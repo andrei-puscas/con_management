@@ -5,6 +5,9 @@
       @if (p.dataSfarsit) {
         <span class="ml-4">Data sfârșit: {{ p.dataSfarsit | date:'dd.MM.yyyy' }}</span>
       }
+      @if (p.buget != null) {
+        <span class="ml-4 font-medium">Buget: {{ p.buget | number:'1.2-2' }} {{ p.moneda || 'RON' }}</span>
+      }
     </div>
 
     <h2 class="mb-3 text-base font-semibold text-neutral-900">Șantiere</h2>

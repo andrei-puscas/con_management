@@ -17,12 +17,25 @@
       <input z-input id="proiect-dataSfarsit" type="date" formControlName="dataSfarsit" />
     </div>
   </div>
-  <div class="space-y-2">
-    <label for="proiect-stare" class="text-sm font-medium text-neutral-700">Stare</label>
-    <select id="proiect-stare" formControlName="stare" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
-      <option value="Activ">Activ</option>
-      <option value="Încheiat">Încheiat</option>
-    </select>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="space-y-2">
+      <label for="proiect-stare" class="text-sm font-medium text-neutral-700">Stare</label>
+      <select id="proiect-stare" formControlName="stare" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
+        <option value="Activ">Activ</option>
+        <option value="Încheiat">Încheiat</option>
+      </select>
+    </div>
+    <div class="space-y-2">
+      <label for="proiect-buget" class="text-sm font-medium text-neutral-700">Buget (opțional)</label>
+      <input z-input id="proiect-buget" type="number" formControlName="buget" placeholder="Ex: 150000" min="0" step="0.01" />
+    </div>
+    <div class="space-y-2">
+      <label for="proiect-moneda" class="text-sm font-medium text-neutral-700">Monedă</label>
+      <select id="proiect-moneda" formControlName="moneda" class="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-neutral-900 focus:border-primary focus:outline focus:ring-1 focus:ring-primary">
+        <option value="RON">RON (Lei)</option>
+        <option value="EUR">EUR (Euro)</option>
+      </select>
+    </div>
   </div>
   @if (formError()) {
     <z-alert zType="destructive" [zDescription]="formError()!" />

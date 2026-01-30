@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AuthService } from './auth.service';
 
+export type MonedaProiect = 'RON' | 'EUR';
+
 export interface ProiectDto {
   id: number;
   nume: string;
@@ -10,6 +12,8 @@ export interface ProiectDto {
   dataStart: string;
   dataSfarsit: string | null;
   stare: string;
+  buget: number | null;
+  moneda: string | null;
 }
 
 export interface CreateProiectRequest {
@@ -18,6 +22,8 @@ export interface CreateProiectRequest {
   dataStart: string;
   dataSfarsit?: string | null;
   stare: string;
+  buget?: number | null;
+  moneda?: MonedaProiect | null;
 }
 
 export interface UpdateProiectRequest {
@@ -26,6 +32,8 @@ export interface UpdateProiectRequest {
   dataStart?: string;
   dataSfarsit?: string | null;
   stare?: string;
+  buget?: number | null;
+  moneda?: MonedaProiect | null;
 }
 
 @Injectable({ providedIn: 'root' })
