@@ -140,6 +140,37 @@ namespace Backend.Migrations
                     b.ToTable("Proiecte");
                 });
 
+            modelBuilder.Entity("Backend.Entities.ProiectComentariu", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DataCreare")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProiectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("UtilizatorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProiectId");
+
+                    b.HasIndex("UtilizatorId");
+
+                    b.ToTable("ProiectComentarii");
+                });
+
             modelBuilder.Entity("Backend.Entities.Santier", b =>
                 {
                     b.Property<int>("Id")
@@ -246,6 +277,25 @@ namespace Backend.Migrations
                     b.Navigation("Santier");
                 });
 
+            modelBuilder.Entity("Backend.Entities.ProiectComentariu", b =>
+                {
+                    b.HasOne("Backend.Entities.Proiect", "Proiect")
+                        .WithMany("Comentarii")
+                        .HasForeignKey("ProiectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Entities.Utilizator", "Utilizator")
+                        .WithMany()
+                        .HasForeignKey("UtilizatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Proiect");
+
+                    b.Navigation("Utilizator");
+                });
+
             modelBuilder.Entity("Backend.Entities.Santier", b =>
                 {
                     b.HasOne("Backend.Entities.Proiect", "Proiect")
@@ -294,6 +344,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Entities.Proiect", b =>
                 {
+                    b.Navigation("Comentarii");
+
                     b.Navigation("Santier");
                 });
 

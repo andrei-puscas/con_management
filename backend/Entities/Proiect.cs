@@ -12,4 +12,5 @@ public class Proiect
     public string? Moneda { get; set; } // RON, EUR
 
     public ICollection<Santier> Santier { get; set; } = new List<Santier>();
+    public ICollection<ProiectComentariu> Comentarii { get; set; } = new List<ProiectComentariu>();
 }

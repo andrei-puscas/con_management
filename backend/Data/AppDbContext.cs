@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Echipa> Echipe { get; set; }
     public DbSet<Angajat> Angajati { get; set; }
     public DbSet<Lucrare> Lucrari { get; set; }
+    public DbSet<ProiectComentariu> ProiectComentarii { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -67,5 +68,18 @@ public class AppDbContext : DbContext
             .HasMany(l => l.Echipe)
             .WithMany(e => e.Lucrari)
             .UsingEntity(j => j.ToTable("LucrareEchipa"));
+
+        modelBuilder.Entity<ProiectComentariu>(e =>
+        {
+            e.HasOne(c => c.Proiect)
+                .WithMany(p => p.Comentarii)
+                .HasForeignKey(c => c.ProiectId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(c => c.Utilizator)
+                .WithMany()
+                .HasForeignKey(c => c.UtilizatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.Property(c => c.Text).HasMaxLength(2000);
+        });
     }
 }

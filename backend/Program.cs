@@ -3,6 +3,7 @@ using Backend.Entities;
 using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -17,7 +18,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+});
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProiecteService, ProiecteService>();
@@ -25,6 +29,7 @@ builder.Services.AddScoped<ISantierService, SantierService>();
 builder.Services.AddScoped<IEchipeService, EchipeService>();
 builder.Services.AddScoped<IAngajatiService, AngajatiService>();
 builder.Services.AddScoped<ILucrariService, LucrariService>();
+builder.Services.AddScoped<IProiectComentariiService, ProiectComentariiService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -96,6 +101,25 @@ IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'Proiecte'
     ALTER TABLE [Proiecte] ADD [Buget] decimal(18,2) NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'Proiecte') AND name = N'Moneda')
     ALTER TABLE [Proiecte] ADD [Moneda] nvarchar(10) NULL;
+");
+
+    // Creează tabelul ProiectComentarii (comentarii / idei pe proiect) dacă nu există
+    await db.Database.ExecuteSqlRawAsync(@"
+IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N'ProiectComentarii')
+BEGIN
+    CREATE TABLE [ProiectComentarii] (
+        [Id] int NOT NULL IDENTITY(1,1),
+        [ProiectId] int NOT NULL,
+        [UtilizatorId] int NOT NULL,
+        [Text] nvarchar(2000) NOT NULL,
+        [DataCreare] datetime2 NOT NULL,
+        CONSTRAINT [PK_ProiectComentarii] PRIMARY KEY ([Id]),
+        CONSTRAINT [FK_ProiectComentarii_Proiecte_ProiectId] FOREIGN KEY ([ProiectId]) REFERENCES [Proiecte] ([Id]) ON DELETE CASCADE,
+        CONSTRAINT [FK_ProiectComentarii_Utilizatori_UtilizatorId] FOREIGN KEY ([UtilizatorId]) REFERENCES [Utilizatori] ([Id]) ON DELETE NO ACTION
+    );
+    CREATE INDEX [IX_ProiectComentarii_ProiectId] ON [ProiectComentarii] ([ProiectId]);
+    CREATE INDEX [IX_ProiectComentarii_UtilizatorId] ON [ProiectComentarii] ([UtilizatorId]);
+END
 ");
 
     if (!await db.Utilizatori.AnyAsync())
