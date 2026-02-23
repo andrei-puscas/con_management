@@ -60,6 +60,43 @@
         </table>
       </div>
     }
+
+    <h2 class="mb-3 mt-8 text-base font-semibold text-neutral-900">Comentarii și idei</h2>
+    <p class="mb-3 text-sm text-neutral-600">Adaugă comentarii sau idei legate de proiect.</p>
+    <div class="mb-3 flex gap-2">
+      <textarea
+        class="min-h-[80px] w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+        placeholder="Scrie un comentariu sau o idee..."
+        [value]="newCommentText()"
+        (input)="newCommentText.set($any($event.target).value)"
+        rows="3"
+      ></textarea>
+      <button z-button zType="default" zSize="sm" class="self-end" (click)="addComentariu()" [disabled]="!newCommentText().trim()">
+        Adaugă
+      </button>
+    </div>
+    @if (comentariiLoading()) {
+      <div class="flex justify-center py-4">
+        <z-loader zSize="sm" />
+      </div>
+    } @else {
+      <ul class="space-y-3">
+        @for (c of comentarii(); track c.id) {
+          <li class="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
+            <div class="mb-1 flex flex-wrap items-center justify-between gap-2">
+              <span class="font-medium text-neutral-700">{{ c.utilizatorEmail ?? 'Utilizator' }}</span>
+              <span class="text-xs text-neutral-500">{{ c.dataCreare | date:'dd.MM.yyyy HH:mm' }}</span>
+              @if (canDeleteComentariu(c)) {
+                <button z-button zType="ghost" zSize="sm" class="ml-auto" (click)="deleteComentariu(c)">Șterge</button>
+              }
+            </div>
+            <p class="whitespace-pre-wrap text-neutral-800">{{ c.text }}</p>
+          </li>
+        } @empty {
+          <li class="py-4 text-center text-neutral-500">Niciun comentariu. Adaugă prima idee sau comentariu.</li>
+        }
+      </ul>
+    }
   </z-card>
 } @else if (error()) {
   <z-card zTitle="Proiect" zDescription="Detalii proiect">

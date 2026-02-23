@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProiecteService, type ProiectDto } from '../../../core/proiecte.service';
 import { SantierService, type SantierDto } from '../../../core/santier.service';
+import { ProiectComentariiService, type ProiectComentariuDto } from '../../../core/proiect-comentarii.service';
+import { AuthService } from '../../../core/auth.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { SantierFormDialogComponent } from '../../santier/santier-form-dialog/santier-form-dialog.component';
 import { ZardCardComponent } from '@/shared/components/card';
@@ -41,10 +43,15 @@ export class ProiectDetailComponent {
   private route = inject(ActivatedRoute);
   private proiecteService = inject(ProiecteService);
   private santierService = inject(SantierService);
+  private comentariiService = inject(ProiectComentariiService);
+  private auth = inject(AuthService);
   private dialogService = inject(ZardDialogService);
 
   proiect = signal<ProiectDto | null>(null);
   santiere = signal<SantierDto[]>([]);
+  comentarii = signal<ProiectComentariuDto[]>([]);
+  comentariiLoading = signal(false);
+  newCommentText = signal('');
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -55,6 +62,7 @@ export class ProiectDetailComponent {
     if (id) {
       this.loadProiect(id);
       this.loadSantiere(id);
+      this.loadComentarii(id);
     } else {
       this.loading.set(false);
       this.error.set('Proiect invalid.');
@@ -87,7 +95,48 @@ export class ProiectDetailComponent {
     if (id) {
       this.loadProiect(id);
       this.loadSantiere(id);
+      this.loadComentarii(id);
     }
+  }
+
+  loadComentarii(proiectId: number): void {
+    this.comentariiLoading.set(true);
+    this.comentariiService.getByProiectId(proiectId).subscribe({
+      next: (list) => {
+        this.comentarii.set(list ?? []);
+        this.comentariiLoading.set(false);
+      },
+      error: () => this.comentariiLoading.set(false),
+    });
+  }
+
+  addComentariu(): void {
+    const text = this.newCommentText().trim();
+    if (!text) return;
+    const id = this.proiectId();
+    this.comentariiService.create(id, text).subscribe({
+      next: (created) => {
+        if (created) {
+          this.newCommentText.set('');
+          this.loadComentarii(id);
+        }
+      },
+    });
+  }
+
+  canDeleteComentariu(c: ProiectComentariuDto): boolean {
+    const email = this.auth.getEmail();
+    if (this.auth.isManagerOrAdmin()) return true;
+    return !!email && c.utilizatorEmail === email;
+  }
+
+  deleteComentariu(c: ProiectComentariuDto): void {
+    if (!confirm('Ștergi acest comentariu / idee?')) return;
+    this.comentariiService.delete(this.proiectId(), c.id).subscribe({
+      next: (ok) => {
+        if (ok) this.loadComentarii(this.proiectId());
+      },
+    });
   }
 
   openAddSantier(): void {
