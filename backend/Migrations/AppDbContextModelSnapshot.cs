@@ -171,6 +171,46 @@ namespace Backend.Migrations
                     b.ToTable("ProiectComentarii");
                 });
 
+            modelBuilder.Entity("Backend.Entities.ProiectFisier", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Continut")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("DataIncarcare")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NumeOriginal")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("ProiectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipFisier")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("UtilizatorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProiectId");
+
+                    b.HasIndex("UtilizatorId");
+
+                    b.ToTable("ProiectFisiere");
+                });
+
             modelBuilder.Entity("Backend.Entities.Santier", b =>
                 {
                     b.Property<int>("Id")
@@ -296,6 +336,25 @@ namespace Backend.Migrations
                     b.Navigation("Utilizator");
                 });
 
+            modelBuilder.Entity("Backend.Entities.ProiectFisier", b =>
+                {
+                    b.HasOne("Backend.Entities.Proiect", "Proiect")
+                        .WithMany("Fisiere")
+                        .HasForeignKey("ProiectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Entities.Utilizator", "Utilizator")
+                        .WithMany()
+                        .HasForeignKey("UtilizatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Proiect");
+
+                    b.Navigation("Utilizator");
+                });
+
             modelBuilder.Entity("Backend.Entities.Santier", b =>
                 {
                     b.HasOne("Backend.Entities.Proiect", "Proiect")
@@ -345,6 +404,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Entities.Proiect", b =>
                 {
                     b.Navigation("Comentarii");
+
+                    b.Navigation("Fisiere");
 
                     b.Navigation("Santier");
                 });

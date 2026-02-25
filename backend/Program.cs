@@ -30,6 +30,7 @@ builder.Services.AddScoped<IEchipeService, EchipeService>();
 builder.Services.AddScoped<IAngajatiService, AngajatiService>();
 builder.Services.AddScoped<ILucrariService, LucrariService>();
 builder.Services.AddScoped<IProiectComentariiService, ProiectComentariiService>();
+builder.Services.AddScoped<IProiectFisiereService, ProiectFisiereService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -120,6 +121,27 @@ BEGIN
     CREATE INDEX [IX_ProiectComentarii_ProiectId] ON [ProiectComentarii] ([ProiectId]);
     CREATE INDEX [IX_ProiectComentarii_UtilizatorId] ON [ProiectComentarii] ([UtilizatorId]);
 END
+");
+
+    // Recreează tabelul ProiectFisiere cu schema nouă (fișiere stocate în DB ca varbinary)
+    await db.Database.ExecuteSqlRawAsync(@"
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = N'ProiectFisiere')
+    DROP TABLE [ProiectFisiere];
+
+CREATE TABLE [ProiectFisiere] (
+    [Id] int NOT NULL IDENTITY(1,1),
+    [ProiectId] int NOT NULL,
+    [UtilizatorId] int NOT NULL,
+    [NumeOriginal] nvarchar(500) NOT NULL,
+    [TipFisier] nvarchar(200) NOT NULL,
+    [Continut] varbinary(max) NOT NULL,
+    [DataIncarcare] datetime2 NOT NULL,
+    CONSTRAINT [PK_ProiectFisiere] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_ProiectFisiere_Proiecte_ProiectId] FOREIGN KEY ([ProiectId]) REFERENCES [Proiecte] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [FK_ProiectFisiere_Utilizatori_UtilizatorId] FOREIGN KEY ([UtilizatorId]) REFERENCES [Utilizatori] ([Id]) ON DELETE NO ACTION
+);
+CREATE INDEX [IX_ProiectFisiere_ProiectId] ON [ProiectFisiere] ([ProiectId]);
+CREATE INDEX [IX_ProiectFisiere_UtilizatorId] ON [ProiectFisiere] ([UtilizatorId]);
 ");
 
     if (!await db.Utilizatori.AnyAsync())

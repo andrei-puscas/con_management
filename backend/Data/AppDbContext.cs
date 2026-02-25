@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Angajat> Angajati { get; set; }
     public DbSet<Lucrare> Lucrari { get; set; }
     public DbSet<ProiectComentariu> ProiectComentarii { get; set; }
+    public DbSet<ProiectFisier> ProiectFisiere { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -80,6 +81,21 @@ public class AppDbContext : DbContext
                 .HasForeignKey(c => c.UtilizatorId)
                 .OnDelete(DeleteBehavior.Restrict);
             e.Property(c => c.Text).HasMaxLength(2000);
+        });
+
+        modelBuilder.Entity<ProiectFisier>(e =>
+        {
+            e.HasOne(f => f.Proiect)
+                .WithMany(p => p.Fisiere)
+                .HasForeignKey(f => f.ProiectId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(f => f.Utilizator)
+                .WithMany()
+                .HasForeignKey(f => f.UtilizatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.Property(f => f.NumeOriginal).HasMaxLength(500);
+            e.Property(f => f.TipFisier).HasMaxLength(200);
+            e.Property(f => f.Continut).HasColumnType("varbinary(max)");
         });
     }
 }

@@ -13,4 +13,5 @@ public class Proiect
 
     public ICollection<Santier> Santier { get; set; } = new List<Santier>();
     public ICollection<ProiectComentariu> Comentarii { get; set; } = new List<ProiectComentariu>();
+    public ICollection<ProiectFisier> Fisiere { get; set; } = new List<ProiectFisier>();
 }
