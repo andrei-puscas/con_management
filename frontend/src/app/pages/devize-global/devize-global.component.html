@@ -1,0 +1,74 @@
+<div>
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-xl font-bold text-neutral-900">Devize de lucrări</h1>
+      <p class="mt-1 text-sm text-neutral-500">Toate devizele din toate proiectele.</p>
+    </div>
+    @if (auth.isManagerOrAdmin()) {
+      <a routerLink="/devize/nou" z-button zType="default" zSize="sm">+ Deviz nou</a>
+    }
+  </div>
+
+  @if (loading()) {
+    <z-loader />
+  } @else if (error()) {
+    <z-alert zType="destructive" [zDescription]="error()!" />
+  } @else if (devize().length === 0) {
+    <div class="rounded-lg border border-dashed border-neutral-300 p-10 text-center text-neutral-400">
+      <p class="text-base font-medium">Nu există devize înregistrate.</p>
+      @if (auth.isManagerOrAdmin()) {
+        <p class="mt-1 text-sm">Apasă „+ Deviz nou" pentru a crea primul deviz.</p>
+      } @else {
+        <p class="mt-1 text-sm">Contactează un manager pentru a crea devize.</p>
+      }
+    </div>
+  } @else {
+    <z-card>
+      <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
+        <table z-table class="min-w-[700px]">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Titlu deviz</th>
+              <th z-table-head>Proiect</th>
+              <th z-table-head>Nr. înreg.</th>
+              <th z-table-head>Data</th>
+              <th z-table-head>Nr. linii</th>
+              <th z-table-head>Total (fără TVA)</th>
+              <th z-table-head class="text-right">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (d of devize(); track d.id) {
+              <tr z-table-row>
+                <td z-table-cell>
+                  <a [routerLink]="['/devize', d.id]" class="font-semibold text-neutral-800 hover:underline">
+                    {{ d.titlu }}
+                  </a>
+                </td>
+                <td z-table-cell>
+                  <a [routerLink]="['/proiecte', d.proiectId]" class="text-neutral-600 hover:underline">
+                    {{ d.numeProiect }}
+                  </a>
+                </td>
+                <td z-table-cell>{{ d.numarInregistrare || '—' }}</td>
+                <td z-table-cell>{{ d.data | date:'dd.MM.yyyy' }}</td>
+                <td z-table-cell>{{ d.linii.length }}</td>
+                <td z-table-cell>
+                  <span class="font-medium">{{ d.totalGeneral | number:'1.2-2' }}</span>
+                  <span class="ml-1 text-neutral-400 text-xs">lei</span>
+                </td>
+                <td z-table-cell class="text-right">
+                  <div class="flex justify-end gap-2">
+                    <a [routerLink]="['/devize', d.id]" z-button zType="outline" zSize="sm">Vezi</a>
+                    <button z-button zType="default" zSize="sm" (click)="downloadPdf(d)">PDF</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </z-card>
+  }
+</div>

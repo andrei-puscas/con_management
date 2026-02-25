@@ -51,6 +51,87 @@ namespace Backend.Migrations
                     b.ToTable("Angajati");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Deviz", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Beneficiar")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<decimal>("CotaTVA")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("Data")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Executant")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("NumarInregistrare")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ProiectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Titlu")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProiectId");
+
+                    b.ToTable("Devize");
+                });
+
+            modelBuilder.Entity("Backend.Entities.DevizLinie", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Cantitate")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Descriere")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DevizId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Numar")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PretUnitar")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("UM")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DevizId");
+
+                    b.ToTable("DevizLinii");
+                });
+
             modelBuilder.Entity("Backend.Entities.Echipa", b =>
                 {
                     b.Property<int>("Id")
@@ -306,6 +387,28 @@ namespace Backend.Migrations
                     b.Navigation("SefEchipa");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Deviz", b =>
+                {
+                    b.HasOne("Backend.Entities.Proiect", "Proiect")
+                        .WithMany("Devize")
+                        .HasForeignKey("ProiectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Proiect");
+                });
+
+            modelBuilder.Entity("Backend.Entities.DevizLinie", b =>
+                {
+                    b.HasOne("Backend.Entities.Deviz", "Deviz")
+                        .WithMany("Linii")
+                        .HasForeignKey("DevizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Deviz");
+                });
+
             modelBuilder.Entity("Backend.Entities.Lucrare", b =>
                 {
                     b.HasOne("Backend.Entities.Santier", "Santier")
@@ -401,9 +504,16 @@ namespace Backend.Migrations
                     b.Navigation("Angajati");
                 });
 
+            modelBuilder.Entity("Backend.Entities.Deviz", b =>
+                {
+                    b.Navigation("Linii");
+                });
+
             modelBuilder.Entity("Backend.Entities.Proiect", b =>
                 {
                     b.Navigation("Comentarii");
+
+                    b.Navigation("Devize");
 
                     b.Navigation("Fisiere");
 

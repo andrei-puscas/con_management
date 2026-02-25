@@ -1,0 +1,311 @@
+<div class="mx-auto max-w-5xl">
+  <!-- Breadcrumb -->
+  <div class="mb-4 flex items-center gap-2 text-sm text-neutral-500">
+    <a routerLink="/devize" class="hover:underline">Devize</a>
+    <span>/</span>
+    @if (deviz()) {
+      <span class="font-medium text-neutral-900">{{ deviz()!.titlu }}</span>
+    } @else {
+      <span class="text-neutral-400">...</span>
+    }
+  </div>
+
+  @if (loading()) {
+    <z-loader />
+  } @else if (error()) {
+    <z-alert zType="destructive" [zDescription]="error()!" />
+  } @else if (deviz()) {
+
+    <!-- ==================== MOD EDITARE ==================== -->
+    @if (editing()) {
+      <z-card zTitle="Editare deviz">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-5">
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Titlu deviz *</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editTitlu()"
+              (input)="editTitlu.set($any($event.target).value)"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Beneficiar</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editBeneficiar()"
+              (input)="editBeneficiar.set($any($event.target).value)"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Executant</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editExecutant()"
+              (input)="editExecutant.set($any($event.target).value)"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Nr. înregistrare</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editNumarInregistrare()"
+              (input)="editNumarInregistrare.set($any($event.target).value)"
+              placeholder="ex: D-001/2026"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Cotă TVA (%)</label>
+            <input
+              type="number" min="0" max="100" step="0.01"
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editCotaTVA()"
+              (input)="editCotaTVA.set(+$any($event.target).value)"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Data</label>
+            <input
+              type="date"
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="editData()"
+              (input)="editData.set($any($event.target).value)"
+            />
+          </div>
+        </div>
+
+        <!-- Separator -->
+        <div class="mb-5 border-t border-neutral-200"></div>
+
+        <!-- Linii -->
+        <div class="mb-5">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Linii deviz</h3>
+            <button z-button zType="outline" zSize="sm" (click)="addLinie()">+ Adaugă linie</button>
+          </div>
+
+          @if (editLinii().length > 0) {
+            <div class="overflow-x-auto rounded-md border border-neutral-200">
+              <table class="w-full text-sm">
+                <thead class="bg-neutral-50 text-neutral-600">
+                  <tr>
+                    <th class="px-3 py-2 text-center w-10 font-medium">Nr.</th>
+                    <th class="px-3 py-2 text-left font-medium">Capitol de lucrări</th>
+                    <th class="px-3 py-2 text-center w-20 font-medium">U.M.</th>
+                    <th class="px-3 py-2 text-right w-28 font-medium">Cantitate</th>
+                    <th class="px-3 py-2 text-right w-32 font-medium">Preț unitar</th>
+                    <th class="px-3 py-2 text-right w-32 font-medium">Total</th>
+                    <th class="px-3 py-2 w-8"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (linie of editLinii(); track linie.numar; let i = $index) {
+                    <tr class="border-t border-neutral-100">
+                      <td class="px-3 py-2 text-center text-neutral-400 font-mono text-xs">{{ linie.numar }}</td>
+                      <td class="px-3 py-1">
+                        <input
+                          class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                          [value]="linie.descriere"
+                          (input)="updateLinie(i, 'descriere', $any($event.target).value)"
+                        />
+                      </td>
+                      <td class="px-3 py-1">
+                        <input
+                          class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                          [value]="linie.um"
+                          (input)="updateLinie(i, 'um', $any($event.target).value)"
+                        />
+                      </td>
+                      <td class="px-3 py-1">
+                        <input
+                          type="number" min="0" step="0.0001"
+                          class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                          [value]="linie.cantitate"
+                          (input)="updateLinie(i, 'cantitate', $any($event.target).value)"
+                        />
+                      </td>
+                      <td class="px-3 py-1">
+                        <input
+                          type="number" min="0" step="0.01"
+                          class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                          [value]="linie.pretUnitar"
+                          (input)="updateLinie(i, 'pretUnitar', $any($event.target).value)"
+                        />
+                      </td>
+                      <td class="px-3 py-2 text-right font-semibold text-neutral-800">
+                        {{ totalLinie(linie) | number:'1.2-2' }}
+                      </td>
+                      <td class="px-2 py-1 text-center">
+                        <button
+                          class="w-6 h-6 rounded text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors text-base font-bold leading-none"
+                          (click)="removeLinie(i)"
+                          title="Șterge linia"
+                        >×</button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+                <tfoot>
+                  <tr class="border-t-2 border-neutral-300 bg-neutral-50">
+                    <td colspan="5" class="px-3 py-2.5 text-right text-sm font-semibold text-neutral-700">TOTAL (fără TVA):</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-bold text-neutral-900">{{ editTotalFaraTva() | number:'1.2-2' }} lei</td>
+                    <td></td>
+                  </tr>
+                  <tr class="bg-neutral-50 border-t border-neutral-200">
+                    <td colspan="5" class="px-3 py-2 text-right text-sm text-neutral-600">TVA {{ editCotaTVA() }}%:</td>
+                    <td class="px-3 py-2 text-right text-sm text-neutral-700">{{ editTotalFaraTva() * editCotaTVA() / 100 | number:'1.2-2' }} lei</td>
+                    <td></td>
+                  </tr>
+                  <tr class="bg-neutral-100 border-t border-neutral-300">
+                    <td colspan="5" class="px-3 py-2.5 text-right text-sm font-bold text-neutral-700">TOTAL CU TVA:</td>
+                    <td class="px-3 py-2.5 text-right text-sm font-bold text-neutral-900">{{ editTotalFaraTva() * (1 + editCotaTVA() / 100) | number:'1.2-2' }} lei</td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          } @else {
+            <div class="rounded-lg border border-dashed border-neutral-300 py-8 text-center text-neutral-400">
+              <p class="text-sm">Nu sunt linii. Apasă „+ Adaugă linie".</p>
+            </div>
+          }
+        </div>
+
+        @if (editError()) {
+          <z-alert zType="destructive" [zDescription]="editError()!" class="mb-4" />
+        }
+
+        <div class="flex items-center justify-between border-t border-neutral-200 pt-4">
+          <button z-button zType="outline" zSize="sm" (click)="cancelEdit()">Anulează</button>
+          <button z-button zType="default" zSize="sm" [disabled]="saving()" (click)="saveEdit()">
+            {{ saving() ? 'Se salvează...' : 'Salvează modificările' }}
+          </button>
+        </div>
+      </z-card>
+
+    <!-- ==================== MOD VIZUALIZARE ==================== -->
+    } @else {
+      <z-card>
+        <!-- Header -->
+        <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 class="text-xl font-bold text-neutral-900">{{ deviz()!.titlu }}</h1>
+            <p class="mt-1 text-sm text-neutral-500">
+              Proiect:
+              <a [routerLink]="['/proiecte', deviz()!.proiectId]" class="font-medium text-neutral-700 hover:underline">
+                {{ deviz()!.numeProiect }}
+              </a>
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            @if (auth.isManagerOrAdmin()) {
+              <button z-button zType="outline" zSize="sm" (click)="startEdit()">Editează</button>
+            }
+            <button
+              z-button zType="default" zSize="sm"
+              [disabled]="downloadingPdf()"
+              (click)="downloadPdf()"
+            >
+              {{ downloadingPdf() ? 'Se generează...' : 'Export PDF' }}
+            </button>
+            @if (auth.isManagerOrAdmin()) {
+              <button z-button zType="outline" zSize="sm" (click)="deleteDeviz()">Șterge</button>
+            }
+            <a routerLink="/devize" z-button zType="outline" zSize="sm">Înapoi</a>
+          </div>
+        </div>
+
+        <!-- Informatii generale -->
+        <div class="mb-6 grid grid-cols-2 gap-3 rounded-lg bg-neutral-50 p-4 text-sm sm:grid-cols-5">
+          <div>
+            <p class="text-xs text-neutral-500 uppercase tracking-wide">Nr. înregistrare</p>
+            <p class="mt-0.5 font-medium text-neutral-800">{{ deviz()!.numarInregistrare || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 uppercase tracking-wide">Data</p>
+            <p class="mt-0.5 font-medium text-neutral-800">{{ deviz()!.data | date:'dd.MM.yyyy' }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 uppercase tracking-wide">Beneficiar</p>
+            <p class="mt-0.5 font-medium text-neutral-800">{{ deviz()!.beneficiar || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 uppercase tracking-wide">Executant</p>
+            <p class="mt-0.5 font-medium text-neutral-800">{{ deviz()!.executant || '—' }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-neutral-500 uppercase tracking-wide">Cotă TVA</p>
+            <p class="mt-0.5 font-medium text-neutral-800">{{ deviz()!.cotaTVA }}%</p>
+          </div>
+        </div>
+
+        <!-- Tabel linii -->
+        @if (deviz()!.linii.length > 0) {
+          <div class="overflow-x-auto rounded-lg border border-neutral-200">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-neutral-800 text-white text-xs uppercase tracking-wider">
+                  <th class="px-3 py-3 text-center w-12">Nr.</th>
+                  <th class="px-3 py-3 text-left">Capitol de lucrări</th>
+                  <th class="px-3 py-3 text-center w-20">U.M.</th>
+                  <th class="px-3 py-3 text-right w-28">Cantitate</th>
+                  <th class="px-3 py-3 text-right w-36">
+                    Preț unitar<br>
+                    <span class="font-normal normal-case text-neutral-300">(fără TVA)</span>
+                  </th>
+                  <th class="px-3 py-3 text-right w-36">
+                    TOTAL<br>
+                    <span class="font-normal normal-case text-neutral-300">(fără TVA)</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (linie of deviz()!.linii; track linie.id; let odd = $odd) {
+                  <tr [class]="odd ? 'bg-neutral-50' : 'bg-white'" class="border-t border-neutral-100">
+                    <td class="px-3 py-2.5 text-center text-neutral-500 font-mono text-xs">{{ linie.numar }}</td>
+                    <td class="px-3 py-2.5 text-neutral-800">{{ linie.descriere }}</td>
+                    <td class="px-3 py-2.5 text-center text-neutral-600">{{ linie.um }}</td>
+                    <td class="px-3 py-2.5 text-right text-neutral-700">{{ linie.cantitate | number:'1.4-4' }}</td>
+                    <td class="px-3 py-2.5 text-right text-neutral-700">{{ linie.pretUnitar | number:'1.2-2' }}</td>
+                    <td class="px-3 py-2.5 text-right font-semibold text-neutral-900">{{ linie.total | number:'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="border-t-2 border-neutral-300 bg-neutral-100">
+                  <td colspan="5" class="px-3 py-3 text-right text-sm font-bold text-neutral-700">TOTAL GENERAL (fără TVA):</td>
+                  <td class="px-3 py-3 text-right text-sm font-bold text-neutral-900">{{ deviz()!.totalGeneral | number:'1.2-2' }} lei</td>
+                </tr>
+                <tr class="bg-neutral-50 border-t border-neutral-200">
+                  <td colspan="5" class="px-3 py-2.5 text-right text-sm text-neutral-600">TVA {{ deviz()!.cotaTVA }}%:</td>
+                  <td class="px-3 py-2.5 text-right text-sm text-neutral-700">{{ deviz()!.totalGeneral * deviz()!.cotaTVA / 100 | number:'1.2-2' }} lei</td>
+                </tr>
+                <tr class="bg-neutral-800 border-t border-neutral-600">
+                  <td colspan="5" class="px-3 py-3 text-right text-sm font-bold text-white">TOTAL CU TVA:</td>
+                  <td class="px-3 py-3 text-right text-sm font-bold text-white">{{ deviz()!.totalGeneral * (1 + deviz()!.cotaTVA / 100) | number:'1.2-2' }} lei</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        } @else {
+          <div class="rounded-lg border border-dashed border-neutral-200 py-8 text-center text-neutral-400">
+            <p class="text-sm">Devizul nu conține linii.</p>
+          </div>
+        }
+
+        <!-- Semnături -->
+        <div class="mt-8 grid grid-cols-2 gap-8 pt-4 border-t border-neutral-200">
+          <div>
+            <p class="text-sm font-semibold text-neutral-700 mb-6">Beneficiar,</p>
+            <div class="border-b border-neutral-400 h-8"></div>
+            <p class="mt-2 text-xs text-neutral-400">Semnătură și ștampilă</p>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-neutral-700 mb-6">Executant,</p>
+            <div class="border-b border-neutral-400 h-8"></div>
+            <p class="mt-2 text-xs text-neutral-400">Semnătură și ștampilă</p>
+          </div>
+        </div>
+      </z-card>
+    }
+  }
+</div>

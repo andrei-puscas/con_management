@@ -1,0 +1,229 @@
+<div class="mx-auto max-w-5xl">
+  <!-- Breadcrumb -->
+  <div class="mb-4 flex items-center gap-2 text-sm text-neutral-500">
+    <a routerLink="/devize" class="hover:underline">Devize</a>
+    <span>/</span>
+    <span class="font-medium text-neutral-900">Deviz nou</span>
+  </div>
+
+  <z-card zTitle="Creare deviz nou">
+    @if (proiecteLoading()) {
+      <z-loader />
+    } @else {
+      <!-- Date generale -->
+      <div class="mb-6">
+        <h3 class="mb-3 text-sm font-semibold text-neutral-700 uppercase tracking-wide">Date generale</h3>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+          <!-- Proiect -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Proiect *</label>
+            <select
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="proiectId() ?? ''"
+              (change)="proiectId.set($any($event.target).value ? +$any($event.target).value : null)"
+            >
+              <option value="">-- Selectează proiectul --</option>
+              @for (p of proiecte(); track p.id) {
+                <option [value]="p.id">{{ p.nume }} ({{ p.client }})</option>
+              }
+            </select>
+          </div>
+
+          <!-- Titlu -->
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Titlu deviz *</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="titlu()"
+              (input)="titlu.set($any($event.target).value)"
+              placeholder="ex: Deviz lucrări fundație, Deviz instalații electrice"
+            />
+          </div>
+
+          <!-- Beneficiar -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Beneficiar</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="beneficiar()"
+              (input)="beneficiar.set($any($event.target).value)"
+              placeholder="Numele beneficiarului"
+            />
+          </div>
+
+          <!-- Executant -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Executant</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="executant()"
+              (input)="executant.set($any($event.target).value)"
+              placeholder="Firma executantă"
+            />
+          </div>
+
+          <!-- Nr. înregistrare -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Nr. înregistrare</label>
+            <input
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="numarInregistrare()"
+              (input)="numarInregistrare.set($any($event.target).value)"
+              placeholder="ex: D-001/2026"
+            />
+          </div>
+
+          <!-- Cotă TVA -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Cotă TVA (%)</label>
+            <input
+              type="number" min="0" max="100" step="0.01"
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="cotaTVA()"
+              (input)="cotaTVA.set(+$any($event.target).value)"
+            />
+          </div>
+
+          <!-- Data -->
+          <div>
+            <label class="block text-sm font-medium text-neutral-700 mb-1">Data</label>
+            <input
+              type="date"
+              class="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-500"
+              [value]="data()"
+              (input)="data.set($any($event.target).value)"
+            />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Separator -->
+      <div class="mb-6 border-t border-neutral-200"></div>
+
+      <!-- Linii deviz -->
+      <div class="mb-6">
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-neutral-700 uppercase tracking-wide">Linii deviz</h3>
+          <button z-button zType="outline" zSize="sm" (click)="addLinie()">+ Adaugă linie</button>
+        </div>
+
+        @if (linii().length > 0) {
+          <div class="overflow-x-auto rounded-md border border-neutral-200">
+            <table class="w-full text-sm">
+              <thead class="bg-neutral-50 text-neutral-600">
+                <tr>
+                  <th class="px-3 py-2 text-center w-10 font-medium">Nr.</th>
+                  <th class="px-3 py-2 text-left font-medium">Capitol de lucrări</th>
+                  <th class="px-3 py-2 text-center w-20 font-medium">U.M.</th>
+                  <th class="px-3 py-2 text-right w-28 font-medium">Cantitate</th>
+                  <th class="px-3 py-2 text-right w-32 font-medium">Preț unitar (lei)</th>
+                  <th class="px-3 py-2 text-right w-32 font-medium">Total (lei)</th>
+                  <th class="px-3 py-2 w-8"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (linie of linii(); track linie.numar; let i = $index) {
+                  <tr class="border-t border-neutral-100">
+                    <td class="px-3 py-2 text-center text-neutral-400 font-mono text-xs">{{ linie.numar }}</td>
+                    <td class="px-3 py-1">
+                      <input
+                        class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        [value]="linie.descriere"
+                        (input)="updateLinie(i, 'descriere', $any($event.target).value)"
+                        placeholder="Descriere lucrare"
+                      />
+                    </td>
+                    <td class="px-3 py-1">
+                      <input
+                        class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        [value]="linie.um"
+                        (input)="updateLinie(i, 'um', $any($event.target).value)"
+                        placeholder="buc"
+                      />
+                    </td>
+                    <td class="px-3 py-1">
+                      <input
+                        type="number" min="0" step="0.0001"
+                        class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        [value]="linie.cantitate"
+                        (input)="updateLinie(i, 'cantitate', $any($event.target).value)"
+                      />
+                    </td>
+                    <td class="px-3 py-1">
+                      <input
+                        type="number" min="0" step="0.01"
+                        class="w-full rounded border border-neutral-200 px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-neutral-400"
+                        [value]="linie.pretUnitar"
+                        (input)="updateLinie(i, 'pretUnitar', $any($event.target).value)"
+                      />
+                    </td>
+                    <td class="px-3 py-2 text-right font-semibold text-neutral-800">
+                      {{ totalLinie(linie) | number:'1.2-2' }}
+                    </td>
+                    <td class="px-2 py-1 text-center">
+                      <button
+                        class="w-6 h-6 rounded text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors text-base font-bold leading-none"
+                        (click)="removeLinie(i)"
+                        title="Șterge linia"
+                      >×</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="border-t-2 border-neutral-300 bg-neutral-50">
+                  <td colspan="5" class="px-3 py-2.5 text-right text-sm font-semibold text-neutral-700">
+                    TOTAL (fără TVA):
+                  </td>
+                  <td class="px-3 py-2.5 text-right text-sm font-bold text-neutral-900">
+                    {{ totalFaraTva() | number:'1.2-2' }} lei
+                  </td>
+                  <td></td>
+                </tr>
+                <tr class="bg-neutral-50 border-t border-neutral-200">
+                  <td colspan="5" class="px-3 py-2 text-right text-sm text-neutral-600">TVA {{ cotaTVA() }}%:</td>
+                  <td class="px-3 py-2 text-right text-sm text-neutral-700">
+                    {{ totalFaraTva() * cotaTVA() / 100 | number:'1.2-2' }} lei
+                  </td>
+                  <td></td>
+                </tr>
+                <tr class="bg-neutral-100 border-t border-neutral-300">
+                  <td colspan="5" class="px-3 py-2.5 text-right text-sm font-bold text-neutral-700">
+                    TOTAL CU TVA:
+                  </td>
+                  <td class="px-3 py-2.5 text-right text-sm font-bold text-neutral-900">
+                    {{ totalFaraTva() * (1 + cotaTVA() / 100) | number:'1.2-2' }} lei
+                  </td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        } @else {
+          <div class="rounded-lg border border-dashed border-neutral-300 py-8 text-center text-neutral-400">
+            <p class="text-sm">Nu ai adăugat nicio linie.</p>
+            <p class="mt-1 text-xs">Apasă „+ Adaugă linie" pentru a începe.</p>
+          </div>
+        }
+      </div>
+
+      <!-- Eroare + butoane -->
+      @if (error()) {
+        <z-alert zType="destructive" [zDescription]="error()!" class="mb-4" />
+      }
+
+      <div class="flex items-center justify-between border-t border-neutral-200 pt-4">
+        <a routerLink="/devize" z-button zType="outline" zSize="sm">Anulează</a>
+        <button
+          z-button zType="default" zSize="sm"
+          [disabled]="saving()"
+          (click)="save()"
+        >
+          {{ saving() ? 'Se salvează...' : 'Salvează deviz' }}
+        </button>
+      </div>
+    }
+  </z-card>
+</div>

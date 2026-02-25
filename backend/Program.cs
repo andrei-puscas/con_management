@@ -31,6 +31,7 @@ builder.Services.AddScoped<IAngajatiService, AngajatiService>();
 builder.Services.AddScoped<ILucrariService, LucrariService>();
 builder.Services.AddScoped<IProiectComentariiService, ProiectComentariiService>();
 builder.Services.AddScoped<IProiectFisiereService, ProiectFisiereService>();
+builder.Services.AddScoped<IDevizeService, DevizeService>();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -142,6 +143,41 @@ CREATE TABLE [ProiectFisiere] (
 );
 CREATE INDEX [IX_ProiectFisiere_ProiectId] ON [ProiectFisiere] ([ProiectId]);
 CREATE INDEX [IX_ProiectFisiere_UtilizatorId] ON [ProiectFisiere] ([UtilizatorId]);
+");
+
+    // Recreează tabelele Devize și DevizLinii cu schema actualizată
+    await db.Database.ExecuteSqlRawAsync(@"
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = N'DevizLinii')
+    DROP TABLE [DevizLinii];
+IF EXISTS (SELECT 1 FROM sys.tables WHERE name = N'Devize')
+    DROP TABLE [Devize];
+
+CREATE TABLE [Devize] (
+    [Id] int NOT NULL IDENTITY(1,1),
+    [ProiectId] int NOT NULL,
+    [Titlu] nvarchar(500) NOT NULL,
+    [NumarInregistrare] nvarchar(100) NULL,
+    [Beneficiar] nvarchar(500) NULL,
+    [Executant] nvarchar(500) NULL,
+    [CotaTVA] decimal(5,2) NOT NULL DEFAULT 19,
+    [Data] datetime2 NOT NULL,
+    CONSTRAINT [PK_Devize] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Devize_Proiecte_ProiectId] FOREIGN KEY ([ProiectId]) REFERENCES [Proiecte] ([Id]) ON DELETE CASCADE
+);
+CREATE INDEX [IX_Devize_ProiectId] ON [Devize] ([ProiectId]);
+
+CREATE TABLE [DevizLinii] (
+    [Id] int NOT NULL IDENTITY(1,1),
+    [DevizId] int NOT NULL,
+    [Numar] int NOT NULL,
+    [Descriere] nvarchar(1000) NOT NULL,
+    [UM] nvarchar(50) NOT NULL,
+    [Cantitate] decimal(18,4) NOT NULL,
+    [PretUnitar] decimal(18,2) NOT NULL,
+    CONSTRAINT [PK_DevizLinii] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_DevizLinii_Devize_DevizId] FOREIGN KEY ([DevizId]) REFERENCES [Devize] ([Id]) ON DELETE CASCADE
+);
+CREATE INDEX [IX_DevizLinii_DevizId] ON [DevizLinii] ([DevizId]);
 ");
 
     if (!await db.Utilizatori.AnyAsync())

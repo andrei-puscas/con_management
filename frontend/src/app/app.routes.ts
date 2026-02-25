@@ -16,6 +16,26 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'devize',
+    loadComponent: () => import('./pages/devize-global/devize-global.component').then(m => m.DevizeGlobalComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'devize/nou',
+    loadComponent: () => import('./pages/devize-global/deviz-form/deviz-form.component').then(m => m.DevizFormComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'devize/:id',
+    loadComponent: () => import('./pages/devize-global/deviz-detail/deviz-detail.component').then(m => m.DevizDetailComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'proiecte/:id/devize',
+    loadComponent: () => import('./pages/proiecte/devize/devize.component').then(m => m.DevizeComponent),
+    canActivate: [authGuard],
+  },
+  {
     path: 'proiecte/:proiectId/santier/:santierId',
     loadComponent: () => import('./pages/santier/santier-detail/santier-detail.component').then(m => m.SantierDetailComponent),
     canActivate: [authGuard],

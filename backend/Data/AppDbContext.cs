@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
     public DbSet<Lucrare> Lucrari { get; set; }
     public DbSet<ProiectComentariu> ProiectComentarii { get; set; }
     public DbSet<ProiectFisier> ProiectFisiere { get; set; }
+    public DbSet<Deviz> Devize { get; set; }
+    public DbSet<DevizLinie> DevizLinii { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,6 +98,31 @@ public class AppDbContext : DbContext
             e.Property(f => f.NumeOriginal).HasMaxLength(500);
             e.Property(f => f.TipFisier).HasMaxLength(200);
             e.Property(f => f.Continut).HasColumnType("varbinary(max)");
+        });
+
+        modelBuilder.Entity<Deviz>(e =>
+        {
+            e.HasOne(d => d.Proiect)
+                .WithMany(p => p.Devize)
+                .HasForeignKey(d => d.ProiectId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.Property(d => d.Titlu).HasMaxLength(500);
+            e.Property(d => d.NumarInregistrare).HasMaxLength(100);
+            e.Property(d => d.Beneficiar).HasMaxLength(500);
+            e.Property(d => d.Executant).HasMaxLength(500);
+            e.Property(d => d.CotaTVA).HasPrecision(5, 2);
+        });
+
+        modelBuilder.Entity<DevizLinie>(e =>
+        {
+            e.HasOne(l => l.Deviz)
+                .WithMany(d => d.Linii)
+                .HasForeignKey(l => l.DevizId)
+                .OnDelete(DeleteBehavior.Cascade);
+            e.Property(l => l.Descriere).HasMaxLength(1000);
+            e.Property(l => l.UM).HasMaxLength(50);
+            e.Property(l => l.Cantitate).HasPrecision(18, 4);
+            e.Property(l => l.PretUnitar).HasPrecision(18, 2);
         });
     }
 }
