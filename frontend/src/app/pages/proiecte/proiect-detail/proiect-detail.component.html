@@ -61,6 +61,60 @@
       </div>
     }
 
+    <h2 class="mb-3 mt-8 text-base font-semibold text-neutral-900">Atașamente</h2>
+    <p class="mb-3 text-sm text-neutral-600">Documente atașate proiectului: contracte, devize, poze din șantier etc.</p>
+
+    <div class="mb-3 flex flex-wrap items-center gap-3">
+      <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+      <button z-button zType="default" zSize="sm" (click)="fileInput.click()">Încarcă fișier</button>
+    </div>
+    @if (uploadError()) {
+      <z-alert zType="destructive" [zDescription]="uploadError()!" class="mb-3" />
+    }
+    @if (fisiereLoading()) {
+      <div class="flex justify-center py-4">
+        <z-loader zSize="sm" />
+      </div>
+    } @else {
+      <div class="-mx-3 min-w-0 overflow-x-auto sm:mx-0">
+        <table z-table class="min-w-[500px]">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Nume fișier</th>
+              <th z-table-head>Tip</th>
+              <th z-table-head>Încărcat de</th>
+              <th z-table-head>Data</th>
+              <th z-table-head class="w-36 text-right">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @for (f of fisiere(); track f.id) {
+              <tr z-table-row>
+                <td z-table-cell class="font-medium">{{ f.numeOriginal }}</td>
+                <td z-table-cell class="text-xs text-neutral-500">{{ f.tipFisier }}</td>
+                <td z-table-cell class="text-xs text-neutral-500">{{ f.utilizatorEmail ?? '—' }}</td>
+                <td z-table-cell class="text-xs">{{ f.dataIncarcare | date:'dd.MM.yyyy HH:mm' }}</td>
+                <td z-table-cell class="text-right">
+                  <div class="flex flex-wrap justify-end gap-1">
+                    <button z-button zType="outline" zSize="sm" (click)="downloadFisier(f)">Descarcă</button>
+                    @if (canDeleteFisier(f)) {
+                      <button z-button zType="destructive" zSize="sm" (click)="deleteFisier(f)">Șterge</button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr z-table-row>
+                <td z-table-cell [attr.colspan]="6" class="text-center text-neutral-500">
+                  Niciun atașament. Încarcă primul fișier.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
     <h2 class="mb-3 mt-8 text-base font-semibold text-neutral-900">Comentarii și idei</h2>
     <p class="mb-3 text-sm text-neutral-600">Adaugă comentarii sau idei legate de proiect.</p>
     <div class="mb-3 flex gap-2">

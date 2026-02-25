@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ProiecteService, type ProiectDto } from '../../../core/proiecte.service';
 import { SantierService, type SantierDto } from '../../../core/santier.service';
 import { ProiectComentariiService, type ProiectComentariuDto } from '../../../core/proiect-comentarii.service';
+import { ProiectFisiereService, type ProiectFisierDto } from '../../../core/proiect-fisiere.service';
 import { AuthService } from '../../../core/auth.service';
 import { ZardDialogService } from '@/shared/components/dialog/dialog.service';
 import { SantierFormDialogComponent } from '../../santier/santier-form-dialog/santier-form-dialog.component';
@@ -44,6 +45,7 @@ export class ProiectDetailComponent {
   private proiecteService = inject(ProiecteService);
   private santierService = inject(SantierService);
   private comentariiService = inject(ProiectComentariiService);
+  private fisiereService = inject(ProiectFisiereService);
   private auth = inject(AuthService);
   private dialogService = inject(ZardDialogService);
 
@@ -52,6 +54,9 @@ export class ProiectDetailComponent {
   comentarii = signal<ProiectComentariuDto[]>([]);
   comentariiLoading = signal(false);
   newCommentText = signal('');
+  fisiere = signal<ProiectFisierDto[]>([]);
+  fisiereLoading = signal(false);
+  uploadError = signal<string | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -63,6 +68,7 @@ export class ProiectDetailComponent {
       this.loadProiect(id);
       this.loadSantiere(id);
       this.loadComentarii(id);
+      this.loadFisiere(id);
     } else {
       this.loading.set(false);
       this.error.set('Proiect invalid.');
@@ -96,8 +102,71 @@ export class ProiectDetailComponent {
       this.loadProiect(id);
       this.loadSantiere(id);
       this.loadComentarii(id);
+      this.loadFisiere(id);
     }
   }
+
+  loadFisiere(proiectId: number): void {
+    this.fisiereLoading.set(true);
+    this.fisiereService.getByProiectId(proiectId).subscribe({
+      next: (list) => {
+        this.fisiere.set(list ?? []);
+        this.fisiereLoading.set(false);
+      },
+      error: () => this.fisiereLoading.set(false),
+    });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    this.uploadError.set(null);
+    this.fisiereService.upload(this.proiectId(), file).subscribe({
+      next: (result) => {
+        if (result) {
+          this.loadFisiere(this.proiectId());
+        } else {
+          this.uploadError.set('Eroare la încărcarea fișierului.');
+        }
+        input.value = '';
+      },
+      error: () => {
+        this.uploadError.set('Eroare la încărcarea fișierului.');
+        input.value = '';
+      },
+    });
+  }
+
+  downloadFisier(f: ProiectFisierDto): void {
+    const url = this.fisiereService.downloadUrl(this.proiectId(), f.id);
+    const token = this.auth.getToken();
+    // Download cu fetch pentru a include tokenul JWT
+    fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = f.numeOriginal;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+  }
+
+  canDeleteFisier(f: ProiectFisierDto): boolean {
+    const email = this.auth.getEmail();
+    return !!email && f.utilizatorEmail === email;
+  }
+
+  deleteFisier(f: ProiectFisierDto): void {
+    if (!confirm(`Ștergi fișierul „${f.numeOriginal}"?`)) return;
+    this.fisiereService.delete(this.proiectId(), f.id).subscribe({
+      next: (ok) => {
+        if (ok) this.loadFisiere(this.proiectId());
+      },
+    });
+  }
+
 
   loadComentarii(proiectId: number): void {
     this.comentariiLoading.set(true);
