@@ -3,11 +3,12 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from './core/auth.service';
 import { ZardButtonComponent } from '@/shared/components/button';
 import { ZardAvatarComponent } from '@/shared/components/avatar';
+import { ChatBotPanelComponent } from '@/shared/components/chat-bot-panel/chat-bot-panel.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, ZardButtonComponent, ZardAvatarComponent],
+  imports: [RouterOutlet, RouterLink, ZardButtonComponent, ZardAvatarComponent, ChatBotPanelComponent],
   templateUrl: './app.component.html',
 })
 export class AppComponent {

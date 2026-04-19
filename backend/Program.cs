@@ -32,6 +32,11 @@ builder.Services.AddScoped<ILucrariService, LucrariService>();
 builder.Services.AddScoped<IProiectComentariiService, ProiectComentariiService>();
 builder.Services.AddScoped<IProiectFisiereService, ProiectFisiereService>();
 builder.Services.AddScoped<IDevizeService, DevizeService>();
+builder.Services.AddHttpClient<IChatBotService, ChatBotService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.openai.com/v1/");
+    client.Timeout = TimeSpan.FromMinutes(2);
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

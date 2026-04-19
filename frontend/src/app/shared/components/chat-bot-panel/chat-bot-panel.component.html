@@ -1,0 +1,65 @@
+@if (open()) {
+  <div
+    class="fixed bottom-20 right-3 z-50 flex w-[min(100vw-1.5rem,22rem)] flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl sm:right-6 sm:bottom-6 sm:w-96"
+    role="dialog"
+    aria-label="Asistent chat"
+  >
+    <div class="flex items-center justify-between border-b border-neutral-200 bg-neutral-50 px-3 py-2">
+      <span class="text-sm font-semibold text-neutral-900">Asistent</span>
+      <button
+        type="button"
+        class="rounded p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-800"
+        (click)="toggle()"
+        aria-label="Închide"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="max-h-72 min-h-[10rem] space-y-2 overflow-y-auto p-3 text-sm">
+      @if (messages().length === 0) {
+        <p class="text-neutral-500">Întreabă ceva despre aplicație sau despre managementul proiectelor.</p>
+      }
+      @for (m of messages(); track $index) {
+        <div
+          class="rounded-lg px-2.5 py-2"
+          [class.bg-neutral-100]="m.role === 'user'"
+          [class.bg-violet-50]="m.role === 'assistant'"
+        >
+          <span class="text-xs font-medium text-neutral-500">{{ m.role === 'user' ? 'Tu' : 'Asistent' }}</span>
+          <p class="mt-0.5 whitespace-pre-wrap text-neutral-800">{{ m.content }}</p>
+        </div>
+      }
+      @if (loading()) {
+        <p class="text-neutral-400">Se scrie…</p>
+      }
+    </div>
+    @if (error()) {
+      <p class="border-t border-red-100 bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+    }
+    <div class="flex gap-2 border-t border-neutral-200 p-2">
+      <textarea
+        rows="2"
+        class="min-w-0 flex-1 resize-none rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        placeholder="Mesaj…"
+        [ngModel]="input()"
+        (ngModelChange)="input.set($event)"
+        (keydown.control.enter)="send()"
+        (keydown.meta.enter)="send()"
+      ></textarea>
+      <button z-button zType="default" zSize="sm" class="self-end shrink-0" [disabled]="loading()" (click)="send()">
+        Trimite
+      </button>
+    </div>
+  </div>
+}
+
+<button
+  type="button"
+  class="fixed bottom-4 right-3 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground shadow-lg hover:opacity-90 sm:right-6"
+  (click)="toggle()"
+  [attr.aria-expanded]="open()"
+  aria-label="Deschide asistentul chat"
+  title="Chat asistent"
+>
+  💬
+</button>

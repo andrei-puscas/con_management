@@ -71,5 +71,8 @@
     }
     <router-outlet />
   </main>
+  @if (auth.isAuthenticated()) {
+    <app-chat-bot-panel />
+  }
   </div>
 </div>
